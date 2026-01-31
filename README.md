@@ -1,18 +1,20 @@
 # Inception
-*This project has been created as part of 42 curriculum by <hporta-c>.*
+*This project has been created as part of 42 curriculum by hporta-c.*
 
 
 ## Description:
+
 **Docker** is a intergation technology to unify a program with its enviroment in a image by publicating on Docker hub for rendring the utilsation of apk more convinient and efficient.
 This project is a learning environment for exploring the Docker ecosystem. It covers how to build custom Docker images, manage containers efficiently, and use Docker Compose to orchestrate multi‑container applications. The goal is to provide hands‑on examples that help you understand the real‑world Docker workflows.  struct by Docker compose, include Nginx, MariaDB and WordPress(PHP-FPM) custom docker images base from debian: bookworm-slim.
 
 ### 1. Design choices: 
-1. **Nginx**: Nginx is the only entrypoint. Implemented a reverse proxy pattern. Nginx is the only service exposing a port 443 to the host:
+1. **Nginx**: Nginx is webserver, using to read and send request from client connection. Nginx is the only entrypoint. Implemented a reverse proxy pattern. Nginx is the only service exposing a port 443 to the host:
 - **Enhance security**: By isolating WordPress and MariaDB in a private network.
 - **Centralize SSL/TLS**: Nginx handles the encryption/decryption using TSLv1.2/v1.3, ensuring all incoming traffic is secure before reaching internal services.
 - **Simplified infrastructure**: it allows for a single point of configuration for routing, logging, and security policies.
-2. **MariaDB & WordPress**: Custom-built images based on `debian:bookworm-slim`, orchestrated via a private bridge network.
-3. **Automation**: A `Makefile` manages the entire lifecycle (build, run, clean).
+2. **MariaDB**: contain `mariadb-server` and `mariadb-client`. The first one is the server and the second one is client. Server part has missions to start mysql and manage data files, listen port `3306`, it offers WordPress(PHP-FPM) other services. Client part is a mysql commands tool, could connect to server part and test the database running normaly, and executes and operates database.  
+3. **WordPress**: 
+4. **Automation**: Custom-built images based on `debian:bookworm-slim`, orchestrated via a private bridge network. A `Makefile` manages the entire lifecycle (build, run, clean).
 	
 ### 2. Comparison:
 - **Virtual Machine vs Docker**: VM contain the entire OS, resulting in slow startup and high resource consumption. However, Docker shares the host machine kernel, offering lightweight operation and instant startup.
@@ -24,6 +26,7 @@ This project is a learning environment for exploring the Docker ecosystem. It co
 	`$ docker run -d -P --name debian01 --net mynet debian`
 	can isolat container "debian01" in a independant network system.
 - **Docker Volumes vs Bind Mounts**: Binds Mounts depends on the host path, in contrary, Volumes is operated by docker-compose.yml, better cross-platfrom compatibility and greater security.
+
 
 ## Instructions
 
@@ -53,3 +56,4 @@ For more detailed administrative or technical instructions, please refer to [USE
 - **Tasks**: 
   - Designing the logic for the `Makefile` to ensure proper container orchestration.
   - Refined the ssl configuration for the Nginx `nginx.conf`.
+  - helps to write a Makefile call docker-compose.yml
