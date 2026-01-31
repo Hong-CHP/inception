@@ -19,9 +19,9 @@ This project is a learning environment for exploring the Docker ecosystem. It co
 - **Secrets vs Environment variables**: Environment variables are leaked in docker inspect, but Secrets are mounted via memory files(/run/secrets), which is more secure.
 - **Docker network vs Host network**: Docker network has three principal mode, bridge, host or none. Host mode shares directly network between host and container. 
 	Using cmd(for example):
-		$ docker network create --driver bridge --subnet 196.168.0.0/16	--gateway 192.168.0.1 mynet
+	` $ docker network create --driver bridge --subnet 196.168.0.0/16	--gateway 192.168.0.1 mynet`
 	can create a network "mynet" in bridge mode with subnet address than using cmd:
-		$ docker run -d -P --name debian01 --net mynet debian
+	`$ docker run -d -P --name debian01 --net mynet debian`
 	can isolat container "debian01" in a independant network system.
 - **Docker Volumes vs Bind Mounts**: Binds Mounts depends on the host path, in contrary, Volumes is operated by docker-compose.yml, better cross-platfrom compatibility and greater security.
 
