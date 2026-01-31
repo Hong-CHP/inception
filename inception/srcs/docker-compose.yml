@@ -1,0 +1,40 @@
+secrets:
+  db_password:
+    file: ../secrets/db_password.txt
+  db_root_password:
+    file: ../secrets/db_root_password.txt
+
+services:
+  nginx:
+    build: ./requirements/nginx
+    depends_on:
+      - wordpress
+    ports:
+      - 443:443
+    networks:
+      - host1-network
+
+  wordpress:
+    build: ./requirements/wordpress
+    depends_on:
+      - mariadb
+    volumes:
+      - /home/hporta-c/data/wordpress:/var/www/html
+    secrets:
+      - db_password
+    networks:
+      - host1-network
+
+  mariadb:
+    build: ./requirements/mariadb
+    volumes:
+      - /home/hporta-c/data/mysql:/var/lib/mysql
+    secrets:
+      - db_password
+      - db_root_password
+    networks:
+      - host1-network
+
+networks:
+    host1-network:
+      driver: bridge
