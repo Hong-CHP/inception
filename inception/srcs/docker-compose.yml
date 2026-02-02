@@ -31,8 +31,6 @@ services:
       - MYSQL_PASSWORD_FILE=/run/secrets/db_password
     secrets:
       - db_password
-    # volumes:
-    #   - ${DATA_PATH}/wordpress:/var/www/html
     networks:
       - inception
 
