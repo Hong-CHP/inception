@@ -16,6 +16,4 @@ EXPOSE 3306
 
 ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
 
-USER mysql
-
 CMD ["mysqld"]
