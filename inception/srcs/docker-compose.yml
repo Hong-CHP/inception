@@ -25,14 +25,14 @@ services:
     build: ./requirements/wordpress
     depends_on:
       - mariadb
-    env_files:
+    env_file:
       - .env
     environment:
       - MYSQL_PASSWORD_FILE=/run/secrets/db_password
     secrets:
       - db_password
-    volumes:
-      - ${DATA_PATH}/wordpress:/var/www/html
+    # volumes:
+    #   - ${DATA_PATH}/wordpress:/var/www/html
     networks:
       - inception
 

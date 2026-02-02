@@ -8,4 +8,9 @@ RUN apt update && apt install -y wget tar \
 	&& rm -f latest.tar.gz \
 	&& rm -rf /var/lib/apt/lists/*
 
+COPY tools/entrypoint.sh /usr/local/bin/
+RUN chmod +x /usr/local/bin/entrypoint.sh
+
+ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
+	
 CMD ["/usr/sbin/php-fpm8.2", "-F"]
