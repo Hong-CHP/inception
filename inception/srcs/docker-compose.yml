@@ -20,21 +20,22 @@ services:
     networks:
       - inception
 
-  # wordpress:
-  #   build: ./requirements/wordpress
-  #   depends_on:
-  #     - mariadb
-  #   environment:
-  #     - MYSQL_HOST=mariadb
-  #     - MYSQL_USER=wp_user
-  #     - MYSQL_PASSWORD_FILE=/run/secrets/db_password
-  #     - MYSQL_DATABASE=wordpress
-  #   secrets:
-  #     - db_password
-  #   volumes:
-  #     - /home/hporta-c/data/wordpress:/var/www/html
-  #   networks:
-  #     - inception
+  wordpress:
+    container_name: wordpress
+    build: ./requirements/wordpress
+    # depends_on:
+    #   - mariadb
+    # environment:
+    #   - MYSQL_HOST=mariadb
+    #   - MYSQL_USER=wp_user
+    #   - MYSQL_PASSWORD_FILE=/run/secrets/db_password
+    #   - MYSQL_DATABASE=wordpress
+    # secrets:
+    #   - db_password
+    # volumes:
+    #   - /home/hporta-c/data/wordpress:/var/www/html
+    networks:
+      - inception
 
   # nginx:
   #   build: ./requirements/nginx
