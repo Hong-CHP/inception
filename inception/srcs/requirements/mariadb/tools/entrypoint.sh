@@ -25,7 +25,7 @@ CREATE USER IF NOT EXISTS '${MYSQL_USER}'@'%' IDENTIFIED BY '$(cat /run/secrets/
 CREATE USER IF NOT EXISTS '${MYSQL_USER}'@'localhost' IDENTIFIED BY '$(cat /run/secrets/db_password)';
 GRANT ALL PRIVILEGES ON ${MYSQL_DATABASE}.* TO '${MYSQL_USER}'@'%';
 GRANT ALL PRIVILEGES ON ${MYSQL_DATABASE}.* TO '${MYSQL_USER}'@'localhost';
-ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY '$(cat /run/secrets/db_root_password)';
+ALTER USER 'root'@'localhost' IDENTIFIED BY '$(cat /run/secrets/db_root_password)';
 FLUSH PRIVILEGES;
 EOF
 
