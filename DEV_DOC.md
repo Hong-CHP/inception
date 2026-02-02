@@ -96,18 +96,30 @@ In `Dockerfile`, ENV define, for example `ENV MYSQL_PASSWORD_FILE /run/secrets/d
 	- define a network driver bridge
 
 ### build
+**Without Makefile**
 - build each images separatly with cmd:
 `$ docker compose build mariadb`
 `$ docker compose build wordpress`
 `$ docker compose build nginx`
-- create container from images and run it daemon with cmd:
+- create container from images and launch it in detached mode(en background) with cmd:
 `$ docker compose up -d mariadb`
 `$ docker compose up -d wordpress`
 `$ docker compose up -d nginx`
-- exec it with cmd:
+- open an interactive terminal inside a running container with cmd:
 `$ docker exec -it mariadb bash`
 `$ docker exec -it wordpress bash`
 `$ docker exec -it nginx bash`
+- remove container and network
+`$ docker compose down`
+- clean container, network and remove named volumes declared in the "volumes" section of the Compose file and anonymous volumes attached to containers
+`$ docker compose down -v`
+
+**With Make**
+- make all: make up
+- make up: build images and lauch it in detached mode
+- make down: remove container and network
+- make clean: remove container, network and volumes
+- make re: make clean then make up
 
 ## Manage the containers and volumes
 - create volumes for containers by add volumes parameter in docker-compose.yml
