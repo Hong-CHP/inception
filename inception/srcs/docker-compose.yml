@@ -45,6 +45,10 @@ services:
       - wordpress
     ports:
       - 443:443
+    env_file:
+      - .env
+    volumes:
+      - ${DATA_PATH}/wordpress:/var/www/html
     networks:
       - inception
 

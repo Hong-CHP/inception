@@ -2,6 +2,10 @@
 
 set -eu
 
+if [ -f "/etc/php/8.2/fpm/pool.d/www.conf" ]; then
+      sed -i "s|listen = /run/php/php8.2-fpm.sock|listen = 9000|g" /etc/php/8.2/fpm/pool.d/www.conf
+fi
+
 if [ -z "$(ls -A /var/www/html)" ]; then
     cp -r /usr/src/wordpress/* /var/www/html/
 fi

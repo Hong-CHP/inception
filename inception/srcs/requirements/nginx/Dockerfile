@@ -10,4 +10,4 @@ RUN openssl req -x509 -nodes -days 365 \
 
 COPY ./conf/nginx.conf /etc/nginx/nginx.conf
 
-CMD ["/usr/sbin/nginx", "-g", "daemon off"]
+CMD ["/usr/sbin/nginx", "-g", "daemon off;"]
