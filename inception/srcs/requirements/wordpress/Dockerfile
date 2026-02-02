@@ -8,4 +8,4 @@ RUN apt update && apt install -y wget tar \
 	&& rm -f latest.tar.gz \
 	&& rm -rf /var/lib/apt/lists/*
 
-CMD ["php-fpm", "-F"]
+CMD ["/usr/sbin/php-fpm8.2", "-F"]
