@@ -16,24 +16,23 @@ services:
       - db_password
       - db_root_password
     volumes:
-      - /home/hporta-c/data/mysql:/var/lib/mysql
+      - ${DATA_PATH}/mysql:/var/lib/mysql
     networks:
       - inception
 
   wordpress:
     container_name: wordpress
     build: ./requirements/wordpress
-    # depends_on:
-    #   - mariadb
-    # environment:
-    #   - MYSQL_HOST=mariadb
-    #   - MYSQL_USER=wp_user
-    #   - MYSQL_PASSWORD_FILE=/run/secrets/db_password
-    #   - MYSQL_DATABASE=wordpress
-    # secrets:
-    #   - db_password
-    # volumes:
-    #   - /home/hporta-c/data/wordpress:/var/www/html
+    depends_on:
+      - mariadb
+    env_files:
+      - .env
+    environment:
+      - MYSQL_PASSWORD_FILE=/run/secrets/db_password
+    secrets:
+      - db_password
+    volumes:
+      - ${DATA_PATH}/wordpress:/var/www/html
     networks:
       - inception
 
