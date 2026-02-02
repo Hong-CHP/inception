@@ -8,9 +8,4 @@ RUN apt update && apt install -y wget tar \
 	&& rm -f latest.tar.gz \
 	&& rm -rf /var/lib/apt/lists/*
 
-ENV MYSQL_HOST mariadb
-ENV MYSQL_USER wp_user
-ENV MYSQL_PASSWORD_FILE /run/secrets/db_password
-ENV MYSQL_DATABASE wordpress
-
 CMD ["php-fpm", "-F"]

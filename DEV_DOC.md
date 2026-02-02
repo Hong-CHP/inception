@@ -41,8 +41,17 @@ In `Dockerfile`, ENV define, for example `ENV MYSQL_PASSWORD_FILE /run/secrets/d
 ## Build and launch
 
 ### I. MariaDB:
+1. **Dockerfile**: 
+	- Base from debian:bookworm-slim;
+	- update system then intall `mariadb-server` and `mariadb-client`, remove all install package
+	- mkdir `/var/run/mysqld` where stocks a mysqld.sock
+	- ensure mysql user have permission to read `/var/run/mysqld` and `/var/lib/mysql`
+	- copy entrypoint script in `/u	sr/local/bin` and make sure the script can be executed
+	- expose 3306 port
+	- execute cmd `/usr/local/bin/entrypoint.sh` append `mariadb`
+2. **entrypoint.sh**
 	need be initialized when start it first time, and can't be reinitialized repeatly when run it again. We need create this logic:
-	"if data is empty:
+	"if `/var/lib/mysql/myqsl` is empty:
 		initial database
 		create database
 		create user

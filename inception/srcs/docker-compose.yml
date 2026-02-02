@@ -5,36 +5,47 @@ secrets:
     file: ../secrets/db_root_password.txt
 
 services:
-  nginx:
-    build: ./requirements/nginx
-    depends_on:
-      - wordpress
-    ports:
-      - 443:443
-    networks:
-      - host1-network
-
-  wordpress:
-    build: ./requirements/wordpress
-    depends_on:
-      - mariadb
-    volumes:
-      - /home/hporta-c/data/wordpress:/var/www/html
-    secrets:
-      - db_password
-    networks:
-      - host1-network
-
   mariadb:
-    build: ./requirements/mariadb
-    volumes:
-      - /home/hporta-c/data/mysql:/var/lib/mysql
+    container_name: mariadb
+    image: mariadb
+    build: requirements/mariadb
+    restart: always
+    env_file:
+      - .env
     secrets:
       - db_password
       - db_root_password
+    volumes:
+      - /home/hporta-c/data/mysql:/var/lib/mysql
     networks:
-      - host1-network
+      - inception
+
+  # wordpress:
+  #   build: ./requirements/wordpress
+  #   depends_on:
+  #     - mariadb
+  #   environment:
+  #     - MYSQL_HOST=mariadb
+  #     - MYSQL_USER=wp_user
+  #     - MYSQL_PASSWORD_FILE=/run/secrets/db_password
+  #     - MYSQL_DATABASE=wordpress
+  #   secrets:
+  #     - db_password
+  #   volumes:
+  #     - /home/hporta-c/data/wordpress:/var/www/html
+  #   networks:
+  #     - inception
+
+  # nginx:
+  #   build: ./requirements/nginx
+  #   depends_on:
+  #     - wordpress
+  #   ports:
+  #     - 443:443
+  #   networks:
+  #     - inception
 
 networks:
-    host1-network:
+    inception:
+      name: inception
       driver: bridge

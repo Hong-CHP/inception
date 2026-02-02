@@ -12,7 +12,7 @@ This project is a learning environment for exploring the Docker ecosystem. It co
 - **Enhance security**: By isolating WordPress and MariaDB in a private network.
 - **Centralize SSL/TLS**: Nginx handles the encryption/decryption using TSLv1.2/v1.3, ensuring all incoming traffic is secure before reaching internal services.
 - **Simplified infrastructure**: it allows for a single point of configuration for routing, logging, and security policies.
-2. **MariaDB**: contain `mariadb-server` and `mariadb-client`. The first one is the server and the second one is client. Server part has missions to start mysql and manage data files, listen port `3306`, it offers WordPress(PHP-FPM) other services. Client part is a mysql commands tool, could connect to server part and test the database running normaly, and executes and operates database.  
+2. **MariaDB**: contains `mariadb-server` and `mariadb-client`. The first one is the server and the second one is client. Server part has missions to start mysql and manage data files, listen port `3306`, it offers WordPress(PHP-FPM) other services. Client part is a mysql commands tool, could connect to server part and test the database running normaly, and executes and operates database.  
 3. **WordPress**: 
 4. **Automation**: Custom-built images based on `debian:bookworm-slim`, orchestrated via a private bridge network. A `Makefile` manages the entire lifecycle (build, run, clean).
 	
