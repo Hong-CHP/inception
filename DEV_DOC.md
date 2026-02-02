@@ -43,10 +43,10 @@ In `Dockerfile`, ENV define, for example `ENV MYSQL_PASSWORD_FILE /run/secrets/d
 ### I. MariaDB:
 1. **Dockerfile**: 
 	- Base from debian:bookworm-slim;
-	- update system then intall `mariadb-server` and `mariadb-client`, remove all install package
+	- update system then install `mariadb-server` and `mariadb-client`, remove all install package
 	- mkdir `/var/run/mysqld` where stocks a mysqld.sock
 	- ensure mysql user have permission to read `/var/run/mysqld` and `/var/lib/mysql`
-	- copy entrypoint script in `/u	sr/local/bin` and make sure the script can be executed
+	- copy entrypoint script in `/usr/local/bin` and make sure the script can be executed
 	- expose 3306 port
 	- execute cmd `/usr/local/bin/entrypoint.sh` append `mysqld`
 2. **entrypoint.sh**
@@ -61,8 +61,40 @@ In `Dockerfile`, ENV define, for example `ENV MYSQL_PASSWORD_FILE /run/secrets/d
 	start mariadb"
 
 ### II. WordPress:
+1. **Dockerfile**: 
+	- Base from debian:bookworm-slim;
+	- update system then install `wget`, `php-fpm`, `php-mysql`
+	- `mkdir -p /var/www/html/`
+	- wget wordpress website content
+	- tar wordpress package under directory /var/www/html/
+	- remove all install package
+	- copy entrypoint script in `/usr/local/bin` and make sure the script can be executed
+	- execute cmd `/usr/local/bin/entrypoint.sh` append `/usr/sbin/php-fpm8.2 -F`
+2. **entrypoint.sh**
+	copy a standrad file /var/www/html/wp-config-sample.php and change content inside of copy file, instead by ENV
 
+### III. Nginx
+1. **Dockerfile**:
+	- Base from debian:bookworm-slim;
+	- update system then install `nginx`, `openssl`, `ca-certificates`
+	- `mkdir -p /etc/nginx/ssl`
+	- new key and pem out
+	- copy conf file from host to container
+2. **nginx.conf**
+	- define ssl_protocols and certificates
+	- listen 443 as required
+	- define server_name to ensure <login>.42.fr == 127.0.0.1
+	- define root directory for web and default index content
+	- if match location /, try find file at /var/www/html/ or /var/www/html/* else, do index.php with args. Match with ext .php, include all env of fastcgi, tranferer request to wordpress:9000, then handler by /var/www/html/scriptname.sh
 
+### docker-compose.yml
+	- define secrets files's paths
+	- container_name as required;
+	- build from path?
+	- secrets sources from ?
+	- volumes host_path:container_path
+	- define a network driver bridge
 
 ## Manage the containers and volumes
+
 ## Data persistence

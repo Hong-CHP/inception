@@ -2,6 +2,10 @@
 
 set -eu
 
+if [ -z "$(ls -A /var/www/html)" ]; then
+    cp -r /usr/src/wordpress* /var/www/html/
+fi
+
 if [ ! -f "/var/www/html/wp-config.php" ]; then
 	cp /var/www/html/wp-config-sample.php /var/www/html/wp-config.php
 
