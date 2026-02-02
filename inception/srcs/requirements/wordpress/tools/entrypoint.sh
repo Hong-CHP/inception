@@ -3,7 +3,9 @@
 set -eu
 
 if [ -z "$(ls -A /var/www/html)" ]; then
-    cp -r /usr/src/wordpress* /var/www/html/
+    echo "Copying wordpress files into /var/www/html..."
+    cp -r /usr/src/wordpress/* /var/www/html/
+    ls -l /var/www/html/
 fi
 
 if [ ! -f "/var/www/html/wp-config.php" ]; then
