@@ -95,6 +95,27 @@ In `Dockerfile`, ENV define, for example `ENV MYSQL_PASSWORD_FILE /run/secrets/d
 	- volumes host_path:container_path
 	- define a network driver bridge
 
+### build
+- build each images separatly with cmd:
+`$ docker compose build mariadb`
+`$ docker compose build wordpress`
+`$ docker compose build nginx`
+- create container from images and run it daemon with cmd:
+`$ docker compose up -d mariadb`
+`$ docker compose up -d wordpress`
+`$ docker compose up -d nginx`
+- exec it with cmd:
+`$ docker exec -it mariadb bash`
+`$ docker exec -it wordpress bash`
+`$ docker exec -it nginx bash`
+
 ## Manage the containers and volumes
+- create volumes for containers by add volumes parameter in docker-compose.yml
+"volumes:
+	- host_path:container_path"
 
 ## Data persistence
+When container or images are removed, the volumes mounted in host directory will persist.
+When we build a new image and a new container
+- volumes defined in docker-compose.yml can cover container volumes's path
+- a script can resolv and make sure an exitant directory or file would not be reinitialized by a new one
