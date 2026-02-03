@@ -2,17 +2,22 @@
 
 set -u
 
+echo "=== WordPress Initialization ==="
 chown -R www-data:www-data /var/www/html
-
 chmod -R 755 /var/www/html
 
 echo "Waiting for MariaDB.."
-while ! nc -z "$MYSQL_HOST" 3306; do
+while ! nc -z "${MYSQL_HOST}" 3306; do
     sleep 2
 done
 
 echo "MariaDB is ready!"
 sleep 5
+
+MYSQL_PASSWORD=$(cat "${MYSQL_PASSWORD_FILE}")
+
+echo "Checking database connection with wp-cli.."
+sleep 10
 
 if [ ! -f "/var/www/html/wp-settings.php" ]; then
     cp -r /usr/src/wordpress/* /var/www/html/
@@ -27,9 +32,6 @@ if [ ! -f "/var/www/html/wp-config.php" ]; then
 	sed -i "s/password_here/userpwd/" /var/www/html/wp-config.php
 	sed -i "s/localhost/${MYSQL_HOST}/" /var/www/html/wp-config.php
 fi
-
-echo "Checking database connection with wp-cli.."
-sleep 10
 
 if ! wp core is-installed --path=/var/www/html --allow-root 2>/dev/null; then
 	ADMIN_USER=$(grep WP_ADMIN_USER /run/secrets/credentials | cut -d '=' -f2)
