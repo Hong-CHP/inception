@@ -1,8 +1,8 @@
 secrets:
-  db_password:
-    file: ../secrets/db_password.txt
-  db_root_password:
-    file: ../secrets/db_root_password.txt
+#  db_password:
+#    file: ../secrets/db_password.txt
+#  db_root_password:
+#    file: ../secrets/db_root_password.txt
   credentials:
     file: ../secrets/credentials.txt
 
@@ -14,9 +14,9 @@ services:
     restart: always
     env_file:
       - .env
-    secrets:
-      - db_password
-      - db_root_password
+#    secrets:
+#      - db_password
+#      - db_root_password
     volumes:
       - ${DATA_PATH}/mysql:/var/lib/mysql
     networks:
@@ -30,10 +30,10 @@ services:
       - mariadb
     env_file:
       - .env
-    environment:
-      - MYSQL_PASSWORD_FILE=/run/secrets/db_password
+#    environment:
+#      - MYSQL_PASSWORD_FILE=/run/secrets/db_password
     secrets:
-      - db_password
+#      - db_password
       - credentials
     volumes:
       - ${DATA_PATH}/wordpress:/var/www/html

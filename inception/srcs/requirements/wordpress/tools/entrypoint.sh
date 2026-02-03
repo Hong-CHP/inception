@@ -24,16 +24,12 @@ if [ ! -f "/var/www/html/wp-config.php" ]; then
 
 	sed -i "s/database_name_here/${MYSQL_DATABASE}/" /var/www/html/wp-config.php
 	sed -i "s/username_here/${MYSQL_USER}/" /var/www/html/wp-config.php
-	sed -i "s/password_here/$(cat ${MYSQL_PASSWORD_FILE})/" /var/www/html/wp-config.php
+	sed -i "s/password_here/userpwd/" /var/www/html/wp-config.php
 	sed -i "s/localhost/${MYSQL_HOST}/" /var/www/html/wp-config.php
 fi
 
-while ! mysql -h ${MYSQL_HOST} -u ${MYSQL_USER} -p$(cat ${MYSQL_PASSWORD_FILE}) -e "SHOW DATABASES;" &> /dev/null; do
-    echo "waiting for database connection..."
-    sleep 3
-done
-
-sleep 2
+echo "Checking database connection with wp-cli.."
+sleep 10
 
 if ! wp core is-installed --path=/var/www/html --allow-root 2>/dev/null; then
 	ADMIN_USER=$(grep WP_ADMIN_USER /run/secrets/credentials | cut -d '=' -f2)

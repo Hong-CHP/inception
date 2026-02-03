@@ -19,16 +19,22 @@ if [ -z "$(ls -A /var/lib/mysql)" ]; then
 
 	#initialized mariadb with mysql user and define data directory
 	mariadb-install-db --user=mysql --datadir=/var/lib/mysql
+	
+	ROOT_PWD="rootpwd"
+	USER_PWD="userpwd"
+	
+	echo "root password will be : $ROOT_PWD"
+	echo "user password will be : $USER_PWD"
 
 	#initialzed in bootstrap way
 	mysqld --user=mysql --bootstrap <<EOF
 FLUSH PRIVILEGES;
 CREATE DATABASE IF NOT EXISTS ${MYSQL_DATABASE};
-CREATE USER IF NOT EXISTS '${MYSQL_USER}'@'%' IDENTIFIED BY '$(cat /run/secrets/db_password)';
-CREATE USER IF NOT EXISTS '${MYSQL_USER}'@'localhost' IDENTIFIED BY '$(cat /run/secrets/db_password)';
+CREATE USER IF NOT EXISTS '${MYSQL_USER}'@'%' IDENTIFIED BY '${USER_PWD}';
+CREATE USER IF NOT EXISTS '${MYSQL_USER}'@'localhost' IDENTIFIED BY '${USER_PWD}';
 GRANT ALL PRIVILEGES ON ${MYSQL_DATABASE}.* TO '${MYSQL_USER}'@'%';
 GRANT ALL PRIVILEGES ON ${MYSQL_DATABASE}.* TO '${MYSQL_USER}'@'localhost';
-ALTER USER 'root'@'localhost' IDENTIFIED BY '$(cat /run/secrets/db_root_password)';
+ALTER USER 'root'@'localhost' IDENTIFIED BY '${ROOT_PWD}';
 FLUSH PRIVILEGES;
 EOF
 
