@@ -9,10 +9,12 @@ RUN mkdir -p /var/run/mysqld \
 	&& chown -R mysql:mysql /var/run/mysqld \
 	&& chown -R mysql:mysql /var/lib/mysql
 
+EXPOSE 3306
+
+# COPY tools/init.sql /docker-entrypoint-initdb.d/
+
 COPY tools/entrypoint.sh /usr/local/bin/
 RUN chmod +x /usr/local/bin/entrypoint.sh
-
-EXPOSE 3306
 
 ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
 
