@@ -4,7 +4,6 @@ set -e
 #-e if error exit
 #-u if env var not defined exit
 
-bash init.sh
 chown -R mysql:mysql /var/lib/mysql
 chown -R mysql:mysql /var/run/mysqld
 
@@ -24,7 +23,10 @@ if [ ! -d "/var/lib/mysql/mysql" ]; then
     echo "root password will be : $MYSQL_ROOT_PASSWORD"
     echo "user password will be : $MYSQL_PASSWORD"
     
-    mysql --user=mysql <<EOF
+    mysqld_safe --datadir=/var/lib/mysql --skip-networking &
+    sleep 10
+
+    mysql -uroot --socket=/run/msqld/msqld.sock <<EOF
 ALTER USER 'root'@'localhost' IDENTIFIED BY '${MYSQL_ROOT_PASSWORD}';
 CREATE USER IF NOT EXISTS 'root'@'%' IDENTIFIED BY '${MYSQL_ROOT_PASSWORD}';
 GRANT ALL PRIVILEGES ON *.* TO 'root'@'%' WITH GRANT OPTION;
@@ -35,7 +37,7 @@ GRANT ALL PRIVILEGES ON ${MYSQL_DATABASE}.* TO '${MYSQL_USER}'@'%';
 
 FLUSH PRIVILEGES;
 EOF
-
+    mysqladmin -uroot -p"${MYSQL_ROOT_PASSWORD}" --socket=/run/mysqld/mysqld.sock shutdown
     echo "MariaDB initialization completed"
 fi
 
