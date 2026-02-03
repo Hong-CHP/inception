@@ -6,10 +6,6 @@ chown -R www-data:www-data /var/www/html
 
 chmod -R 755 /var/www/html
 
-if [ -f "/etc/php/8.2/fpm/pool.d/www.conf" ]; then
-      sed -i "s|listen = /run/php/php8.2-fpm.sock|listen = 9000|g" /etc/php/8.2/fpm/pool.d/www.conf
-fi
-
 if [ ! -f "/var/www/html/wp-settings.php" ]; then
     cp -r /usr/src/wordpress/* /var/www/html/
 fi
