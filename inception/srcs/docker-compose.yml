@@ -36,8 +36,6 @@ services:
         condition: service_healthy
     env_file:
       - .env
-    environment:
-      MYSQL_PASSWORD_FILE: /run/secrets/db_password
     secrets:
       - db_password
       - credentials

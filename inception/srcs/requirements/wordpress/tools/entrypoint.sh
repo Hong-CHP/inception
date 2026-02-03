@@ -14,7 +14,7 @@ done
 echo "MariaDB is ready!"
 sleep 5
 
-MYSQL_PASSWORD=$(cat "${MYSQL_PASSWORD_FILE}")
+MYSQL_PASSWORD=$(cat "/run/secrets/db_password")
 
 echo "Checking database connection with wp-cli.."
 sleep 10
@@ -25,13 +25,25 @@ if [ ! -f "/var/www/html/wp-settings.php" ]; then
 fi
 
 if [ ! -f "/var/www/html/wp-config.php" ]; then
-	cp /var/www/html/wp-config-sample.php /var/www/html/wp-config.php
-
-	sed -i "s/database_name_here/${MYSQL_DATABASE}/" /var/www/html/wp-config.php
-	sed -i "s/username_here/${MYSQL_USER}/" /var/www/html/wp-config.php
-	sed -i "s/password_here/${MYSQL_PASSWORD}/" /var/www/html/wp-config.php
-	sed -i "s/localhost/${MYSQL_HOST}/" /var/www/html/wp-config.php
+    echo "Creating wp-config.php..."
+    wp config create \
+        --dbname="${MYSQL_DATABASE}" \
+        --dbuser="${MYSQL_USER}" \
+        --dbpass="${MYSQL_PASSWORD}" \
+        --dbhost="${MYSQL_HOST}" \
+        --locale=en_US \
+        --path=/var/www/html \
+        --allow-root
 fi
+
+# if [ ! -f "/var/www/html/wp-config.php" ]; then
+# 	cp /var/www/html/wp-config-sample.php /var/www/html/wp-config.php
+
+# 	sed -i "s/database_name_here/${MYSQL_DATABASE}/" /var/www/html/wp-config.php
+# 	sed -i "s/username_here/${MYSQL_USER}/" /var/www/html/wp-config.php
+# 	sed -i "s/password_here/${MYSQL_PASSWORD}/" /var/www/html/wp-config.php
+# 	sed -i "s/localhost/${MYSQL_HOST}/" /var/www/html/wp-config.php
+# fi
 
 if ! wp core is-installed --path=/var/www/html --allow-root 2>/dev/null; then
 	ADMIN_USER=$(grep WP_ADMIN_USER /run/secrets/credentials | cut -d '=' -f2)
