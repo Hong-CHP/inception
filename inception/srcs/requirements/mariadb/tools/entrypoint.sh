@@ -5,7 +5,6 @@ set -eu
 #-u if env var not defined exit
 
 chown -R mysql:mysql /var/lib/mysql
-chmod -R 755 /var/lib/mysql
 chown -R mysql:mysql /var/run/mysqld
 
 #bind adress to any adress
@@ -15,14 +14,14 @@ if [ ! -f "/etc/mysql/mariadb.conf.d/50-server.cnf.bak" ]; then
     echo "Inception: Config updated to listen on 0.0.0.0"
 fi
 #make sure mariadb is not initialized before
-if [ ! -d "/var/lib/mysql/${MYSQL_DATABASE}" ]; then
+if [ -z "$(ls -A /var/lib/mysql)" ]; then
 	echo "Initializing MariaDB..."
 
 	#initialized mariadb with mysql user and define data directory
 	mariadb-install-db --user=mysql --datadir=/var/lib/mysql
 
 	#initialzed in bootstrap way
-	mysqld --bootstrap <<EOF
+	mysqld --user=mysql --bootstrap <<EOF
 FLUSH PRIVILEGES;
 CREATE DATABASE IF NOT EXISTS ${MYSQL_DATABASE};
 CREATE USER IF NOT EXISTS '${MYSQL_USER}'@'%' IDENTIFIED BY '$(cat /run/secrets/db_password)';

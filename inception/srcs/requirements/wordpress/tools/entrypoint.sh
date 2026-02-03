@@ -6,8 +6,17 @@ chown -R www-data:www-data /var/www/html
 
 chmod -R 755 /var/www/html
 
+echo "Waiting for MariaDB.."
+while ! nc -z "$MYSQL_HOST" 3306; do
+    sleep 2
+done
+
+echo "MariaDB is ready!"
+sleep 5
+
 if [ ! -f "/var/www/html/wp-settings.php" ]; then
     cp -r /usr/src/wordpress/* /var/www/html/
+	chown -R www-data:www-data /var/www/html
 fi
 
 if [ ! -f "/var/www/html/wp-config.php" ]; then
@@ -19,10 +28,9 @@ if [ ! -f "/var/www/html/wp-config.php" ]; then
 	sed -i "s/localhost/${MYSQL_HOST}/" /var/www/html/wp-config.php
 fi
 
-echo "waiting for mariadb.."
-while ! nc -z "$MYSQL_HOST" 3306; do
-	echo "wait database..."
-	sleep 3
+while ! mysql -h ${MYSQL_HOST} -u ${MYSQL_USER} -p$(cat ${MYSQL_PASSWORD_FILE}) -e "SHOW DATABASES;" &> /dev/null; do
+    echo "waiting for database connection..."
+    sleep 3
 done
 
 sleep 2
@@ -31,8 +39,8 @@ if ! wp core is-installed --path=/var/www/html --allow-root 2>/dev/null; then
 	ADMIN_USER=$(grep WP_ADMIN_USER /run/secrets/credentials | cut -d '=' -f2)
 	ADMIN_PWD=$(grep WP_ADMIN_PASSWORD /run/secrets/credentials | cut -d '=' -f2)
 	WPU_USR=$(grep WP_USR /run/secrets/credentials | cut -d '=' -f2)
-    	WPU_PWD=$(grep WP_PWD /run/secrets/credentials | cut -d '=' -f2)
-    	WPU_EMAIL=$(grep WP_EMAIL /run/secrets/credentials | cut -d '=' -f2)
+    WPU_PWD=$(grep WP_PWD /run/secrets/credentials | cut -d '=' -f2)
+    WPU_EMAIL=$(grep WP_EMAIL /run/secrets/credentials | cut -d '=' -f2)
 
 	echo "WordPress database not found. Installing..."
 	wp core install \
@@ -48,7 +56,7 @@ if ! wp core is-installed --path=/var/www/html --allow-root 2>/dev/null; then
 	wp user create \
 		"${WPU_USR}" "${WPU_EMAIL}" \
 		--user_pass="${WPU_PWD}" \
-        	--role=author \
+        --role=author \
 		--path=/var/www/html \
 		--allow-root
 else
@@ -56,6 +64,7 @@ else
 fi
 
 mkdir -p /run/php
+chown www-data:www-data /run/php
 
 echo "WordPress launch succesfully!"
 
