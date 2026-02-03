@@ -28,7 +28,7 @@ sleep 30
 
 # 测试root登录
 echo "测试root登录..."
-docker exec mariadb mysql -u root -p$(cat /run/secrets/db_root_password) -e "SELECT 1;" 2>&1
+docker exec mariadb mysql -u root -p$(cat ../secrets/db_root_password) -e "SELECT 1;" 2>&1
 
 if [ $? -eq 0 ]; then
     echo "✓ Root登录成功"
@@ -38,7 +38,7 @@ fi
 
 # 测试wp_user登录
 echo "测试wp_user登录..."
-docker exec mariadb mysql -u wp_user -p$(cat /run/secrets/db_password) -e "SELECT 1;" 2>&1
+docker exec mariadb mysql -u wp_user -p$(cat ..O/secrets/db_password) -e "SELECT 1;" 2>&1
 
 if [ $? -eq 0 ]; then
     echo "✓ wp_user登录成功"
