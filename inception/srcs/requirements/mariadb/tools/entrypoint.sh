@@ -4,6 +4,10 @@ set -eu
 #-e if error exit
 #-u if env var not defined exit
 
+chown -R mysql:mysql /var/lib/mysql
+chmod -R 755 /var/lib/mysql
+chown -R mysql:mysql /var/run/mysqld
+
 #bind adress to any adress
 if [ ! -f "/etc/mysql/mariadb.conf.d/50-server.cnf.bak" ]; then
     sed -i "s|127.0.0.1|0.0.0.0|g" /etc/mysql/mariadb.conf.d/50-server.cnf
@@ -11,7 +15,7 @@ if [ ! -f "/etc/mysql/mariadb.conf.d/50-server.cnf.bak" ]; then
     echo "Inception: Config updated to listen on 0.0.0.0"
 fi
 #make sure mariadb is not initialized before
-if [ ! -d "/var/lib/mysql/mysql" ]; then
+if [ ! -d "/var/lib/mysql/${MYSQL_DATABASE}" ]; then
 	echo "Initializing MariaDB..."
 
 	#initialized mariadb with mysql user and define data directory

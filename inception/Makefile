@@ -11,6 +11,11 @@ down:
 clean:
 	$(COMPOSE) down -v
 
-re: clean up
+fclean:
+	sudo rm -rf /home/hporta-c/data/mysql
+	sudo rm -rf /home/hporta-c/data/wordpress
+	docker system prune -af
 
-.PHONY: all up down clean re
+re: fclean all
+
+.PHONY: all up down clean fclean re
