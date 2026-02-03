@@ -31,9 +31,9 @@ if [ ! -d "/var/lib/mysql/mysql" ]; then
     # 设置root密码 - 使用传统UPDATE方法，这是最可靠的
     echo "Setting root password..."
     mysql --socket=/var/run/mysqld/mysqld.sock <<EOF
-USE mysql;
-UPDATE user SET plugin='mysql_native_password';
-UPDATE user SET password=PASSWORD('$MYSQL_ROOT_PASSWORD') WHERE User='root';
+ALTER USER 'root'@'localhost' IDENTIFIED BY 'ROOT_PASSWORD';
+CREATE USER IF NOT EXISTS 'root'@'%' IDENTIFIED BY 'ROOT_PASSWORD';
+GRANT ALL PRIVILEGES ON *.* TO 'root'@'%' WITH GRANT OPTION;
 FLUSH PRIVILEGES;
 EOF
 
