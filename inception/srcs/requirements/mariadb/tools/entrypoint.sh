@@ -29,15 +29,18 @@ ALTER USER 'root'@'localhost' IDENTIFIED BY '${MYSQL_ROOT_PASSWORD}';
 CREATE USER IF NOT EXISTS 'root'@'%' IDENTIFIED BY '${MYSQL_ROOT_PASSWORD}';
 GRANT ALL PRIVILEGES ON *.* TO 'root'@'%' WITH GRANT OPTION;
 
-CREATE DATABASE IF NOT EXISTS wordpress;
-CREATE USER IF NOT EXISTS 'wp_user'@'%' IDENTIFIED BY '${MYSQL_PASSWORD}';
-GRANT ALL PRIVILEGES ON wordpress.* TO 'wp_user'@'%';
+CREATE DATABASE IF NOT EXISTS ${MYSQL_DATABASE};
+CREATE USER IF NOT EXISTS '${MYSQL_USER}'@'%' IDENTIFIED BY '${MYSQL_PASSWORD}';
+GRANT ALL PRIVILEGES ON ${MYSQL_DATABASE}.* TO '${MYSQL_USER}'@'%';
 
 FLUSH PRIVILEGES;
 EOF
 
     echo "MariaDB initialization completed"
 fi
+
+echo "Starting MariaDB..."
+exec mysqld --user=mysql
 #     mysqld --user=mysql --skip-networking & pid="$!"
 
 #     # 等待MySQL启动
@@ -72,5 +75,3 @@ fi
 #     echo "MariaDB initialization completed"
 # fi
 
-echo "Starting MariaDB..."
-exec mysqld --user=mysql
