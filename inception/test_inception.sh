@@ -5,13 +5,6 @@ echo "=== Inception Project Test ==="
 # 进入srcs目录
 cd srcs
 
-# 停止并清理
-echo "1. Cleaning up..."
-docker compose down -v
-sudo rm -rf /home/hporta-c/data
-mkdir -p /home/hporta-c/data/{mysql,wordpress}
-chmod 755 /home/hporta-c/data
-
 # 构建
 echo "2. Building containers..."
 docker compose build --no-cache
