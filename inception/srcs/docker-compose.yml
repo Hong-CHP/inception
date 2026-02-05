@@ -17,7 +17,7 @@ services:
      - db_password
      - db_root_password
     volumes:
-      - ${DATA_PATH}/mysql:/var/lib/mysql
+      - ${DATA_PATH}/mariadb:/var/lib/mysql
     networks:
       - inception
     healthcheck:
