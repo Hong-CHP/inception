@@ -11,7 +11,8 @@ RUN mkdir -p /var/run/mysqld \
 
 EXPOSE 3306
 
-# COPY tools/init.sql /docker-entrypoint-initdb.d/
+COPY tools/init.sh /usr/local/bin
+RUN chmod +x /usr/local/bin/init.sh
 
 COPY tools/entrypoint.sh /usr/local/bin/
 RUN chmod +x /usr/local/bin/entrypoint.sh
