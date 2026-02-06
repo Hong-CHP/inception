@@ -16,6 +16,9 @@ services:
     secrets:
      - db_password
      - db_root_password
+    environment:
+     MYSQL_PASSWORD_FILE: /run/secrets/db_password
+     MYSQL_ROOT_PASSWORD_FILE: /run/secrets/db_root_password
     volumes:
       - ${DATA_PATH}/mariadb:/var/lib/mysql
     networks:
