@@ -39,7 +39,8 @@ RUN echo "mariadb-server-10.11 mysql-server/root_password password MyRootPass123
     echo "mariadb-server-10.11 mysql-server/root_password_again password MyRootPass123" | debconf-set-selections
 
 # 创建初始化脚本：创建普通用户 myuser
-COPY init.sql /docker-entrypoint-initdb.d/init.sql
+COPY tools/init.sh /usr/local/bin
+RUN chmod +x /usr/local/bin/init.sh
 
 # 设置工作目录
 WORKDIR /var/lib/mysql
