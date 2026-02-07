@@ -1,62 +1,62 @@
 #!/bin/bash
 
-set -e
+# set -e
 
-MYSQL_ROOT_PASSWORD=$(cat "$MYSQL_ROOT_PASSWORD_FILE")
+# MYSQL_ROOT_PASSWORD=$(cat "$MYSQL_ROOT_PASSWORD_FILE")
 
-DATADIR="/var/lib/mysql"
-SOCKET="/run/mysqld/mysqld.sock"
+# DATADIR="/var/lib/mysql"
+# SOCKET="/run/mysqld/mysqld.sock"
 
-echo "▶ MariaDB entrypoint starting"
+# echo "▶ MariaDB entrypoint starting"
 
-# ------------------------------------------------------------------
-# INIT PHASE (first run only)
-# ------------------------------------------------------------------
-if [ ! -d "$DATADIR/mysql" ]; then
-    echo "▶ Initializing database directory"
+# # ------------------------------------------------------------------
+# # INIT PHASE (first run only)
+# # ------------------------------------------------------------------
+# if [ ! -d "$DATADIR/mysql" ]; then
+#     echo "▶ Initializing database directory"
 
-    chown -R mysql:mysql "$DATADIR"
-    mysql_install_db --user=mysql --datadir="$DATADIR"
+#     chown -R mysql:mysql "$DATADIR"
+#     mysql_install_db --user=mysql --datadir="$DATADIR"
 
-    echo "▶ Starting MariaDB (socket only, no TCP)"
-    mysqld --user=mysql \
-           --datadir="$DATADIR" \
-           --skip-networking \
-           --socket="$SOCKET" &
-    pid="$!"
+#     echo "▶ Starting MariaDB (socket only, no TCP)"
+#     mysqld --user=mysql \
+#            --datadir="$DATADIR" \
+#            --skip-networking \
+#            --socket="$SOCKET" &
+#     pid="$!"
 
-    echo "▶ Waiting for socket to be ready"
-    until mysqladmin --socket="$SOCKET" ping --silent; do
-        sleep 1
-    done
+#     echo "▶ Waiting for socket to be ready"
+#     until mysqladmin --socket="$SOCKET" ping --silent; do
+#         sleep 1
+#     done
 
-    echo "▶ Setting root password and basic security"
-    mysql --socket="$SOCKET" -u root <<EOF
-ALTER USER 'root'@'localhost' IDENTIFIED BY '${MYSQL_ROOT_PASSWORD}';
-DELETE FROM mysql.user WHERE User='';
-DROP DATABASE IF EXISTS test;
-DELETE FROM mysql.db WHERE Db='test' OR Db='test\\_%';
-FLUSH PRIVILEGES;
-EOF
+#     echo "▶ Setting root password and basic security"
+#     mysql --socket="$SOCKET" -u root <<EOF
+# ALTER USER 'root'@'localhost' IDENTIFIED BY '${MYSQL_ROOT_PASSWORD}';
+# DELETE FROM mysql.user WHERE User='';
+# DROP DATABASE IF EXISTS test;
+# DELETE FROM mysql.db WHERE Db='test' OR Db='test\\_%';
+# FLUSH PRIVILEGES;
+# EOF
 
-    if [ -f /docker-entrypoint-initdb.d/init.sql ]; then
-        echo "▶ Running init.sql"
-        mysql --socket="$SOCKET" -u root -p"${MYSQL_ROOT_PASSWORD}" \
-            < /docker-entrypoint-initdb.d/init.sql
-    fi
+#     if [ -f /docker-entrypoint-initdb.d/init.sql ]; then
+#         echo "▶ Running init.sql"
+#         mysql --socket="$SOCKET" -u root -p"${MYSQL_ROOT_PASSWORD}" \
+#             < /docker-entrypoint-initdb.d/init.sql
+#     fi
 
-    echo "▶ Shutting down temporary MariaDB"
-    mysqladmin --socket="$SOCKET" -u root -p"${MYSQL_ROOT_PASSWORD}" shutdown
-    wait "$pid"
+#     echo "▶ Shutting down temporary MariaDB"
+#     mysqladmin --socket="$SOCKET" -u root -p"${MYSQL_ROOT_PASSWORD}" shutdown
+#     wait "$pid"
 
-    echo "▶ Database initialization completed"
-fi
+#     echo "▶ Database initialization completed"
+# fi
 
-# ------------------------------------------------------------------
-# RUN PHASE
-# ------------------------------------------------------------------
-echo "▶ Starting MariaDB (TCP enabled)"
-exec mysqld --user=mysql --datadir="$DATADIR"
+# # ------------------------------------------------------------------
+# # RUN PHASE
+# # ------------------------------------------------------------------
+# echo "▶ Starting MariaDB (TCP enabled)"
+# exec mysqld --user=mysql --datadir="$DATADIR"
 
 
 # bash /usr/local/bin/init.sh
@@ -123,23 +123,23 @@ exec mysqld --user=mysql --datadir="$DATADIR"
 # exec mysqld_safe
 
 
-# export MYSQL_ROOT_PASSWORD=$(cat "$MYSQL_ROOT_PASSWORD_FILE")
-# echo "my root pwd is : ${MYSQL_ROOT_PASSWORD}"
+export MYSQL_ROOT_PASSWORD=$(cat "$MYSQL_ROOT_PASSWORD_FILE")
+echo "my root pwd is : ${MYSQL_ROOT_PASSWORD}"
 
-# if [ ! -d "/var/lib/mysql/mysql" ]; then
+if [ ! -d "/var/lib/mysql/mysql" ]; then
 
-#     echo "Initializing database..."
-#     mysql_install_db --user=mysql --datadir=/var/lib/mysql
+    echo "Initializing database..."
+    mysql_install_db --user=mysql --datadir=/var/lib/mysql
 
-#     bash /usr/local/bin/init.sh
+    bash /usr/local/bin/init.sh
 
-#     mysqld --user=mysql --skip-networking --socket=/var/run/mysqld/mysqld.sock &
-#     PID=$!
+    mysqld --user=mysql --skip-networking --socket=/var/run/mysqld/mysqld.sock &
+    PID=$!
 
-#     echo "Waiting for MariaDB to start..."
-#     until mysqladmin ping --socket=/var/run/mysqld/mysqld.sock --silent; do
-#         sleep 2
-#     done
+    echo "Waiting for MariaDB to start..."
+    until mysqladmin ping --socket=/var/run/mysqld/mysqld.sock --silent; do
+        sleep 2
+    done
 
 #     echo "Setting root password..."
 #     mysql --socket=/var/run/mysqld/mysqld.sock -u root <<EOF
@@ -151,18 +151,18 @@ exec mysqld --user=mysql --datadir="$DATADIR"
 # FLUSH PRIVILEGES;
 # EOF
 
-#     if [ -f /docker-entrypoint-initdb.d/init.sql ];then
-#         echo "Running initialization SQL..."
-#         mysql --socket=/var/run/mysqld/mysqld.sock -u root -p"${MYSQL_ROOT_PASSWORD}" < /docker-entrypoint-initdb.d/init.sql
-#     fi
+    if [ -f /docker-entrypoint-initdb.d/init.sql ];then
+        echo "Running initialization SQL..."
+        mysql --socket=/var/run/mysqld/mysqld.sock -u root -p"${MYSQL_ROOT_PASSWORD}" < /docker-entrypoint-initdb.d/init.sql
+    fi
 
-#     if ! kill -s TERM "$PID" || ! wait "$PID"; then
-#         echo "MariaDB initialization process failed"
-#         exit 1
-#     fi
+    if ! kill -s TERM "$PID" || ! wait "$PID"; then
+        echo "MariaDB initialization process failed"
+        exit 1
+    fi
 
-#     echo "Database initialized successfully"
-# fi
+    echo "Database initialized successfully"
+fi
 
-# echo "Starting MariaDB..."
-# exec mysqld --user=mysql
+echo "Starting MariaDB..."
+exec mysqld --user=mysql
