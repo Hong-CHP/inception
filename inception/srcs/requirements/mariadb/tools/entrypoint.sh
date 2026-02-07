@@ -1,20 +1,45 @@
 #!/bin/bash
 
-bash /usr/local/bin/init.sh
-
-mysqld_safe &
-PID="$!"
-
-until mysqladmin ping -h localhost --silent; do
-    sleep 2
-done
-
 export MYSQL_ROOT_PASSWORD=$(cat "$MYSQL_ROOT_PASSWORD_FILE")
-
 echo "my root pwd is : ${MYSQL_ROOT_PASSWORD}"
 
-if [ -f /docker-entrypoint-initdb.d/init.sql ];then
-    mysql -u root -p"${MYSQL_ROOT_PASSWORD}" < /docker-entrypoint-initdb.d/init.sql
+if [ ! -d "/var/lib/mysql/mysql" ]; then
+
+    echo "Initializing database..."
+    mysql_install_db --user=mysql --datadir=/var/lib/mysql
+
+    bash /usr/local/bin/init.sh
+
+    mysqld_safe --skip-networking &
+    PID="$!"
+
+    echo "Waiting for MariaDB to start..."
+    until mysqladmin ping -h localhost --silent; do
+        sleep 2
+    done
+
+    echo "Setting root password..."
+    mysql -u root <<EOF
+ALTER USER 'root'@'localhost' IDENTIFIED BY '${MYSQL_ROOT_PASSWORD}';
+DELETE FROM mysql.user WHERE User='';
+DELETE FROM mysql.user WHERE User='root' AND Host NOT IN ('localhost', '127.0.0.1', '::1');
+DROP DATABASE IF EXISTS test;
+DELETE FROM mysql.db WHERE Db='test' OR Db='test\\_%';
+FLUSH PRIVILEGES;
+EOF
+
+    if [ -f /docker-entrypoint-initdb.d/init.sql ];then
+        echo "Running initialization SQL..."
+        mysql -u root -p"${MYSQL_ROOT_PASSWORD}" < /docker-entrypoint-initdb.d/init.sql
+    fi
+
+    if ! kill -s TERM "$pid" || ! wait "$pid"; then
+        echo "MariaDB initialization process failed"
+        exit 1
+    fi
+
+    echo "Database initialized successfully"
 fi
 
-wait "$PID"
+echo "Starting MariaDB..."
+exec mysqld_safe
