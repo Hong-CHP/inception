@@ -10,16 +10,16 @@ if [ ! -d "/var/lib/mysql/mysql" ]; then
 
     bash /usr/local/bin/init.sh
 
-    mysqld_safe --skip-networking &
-    PID="$!"
+    mysqld --user=mysql --skip-networking --socket=/var/run/mysqld/mysqld.sock &
+    PID=$!
 
     echo "Waiting for MariaDB to start..."
-    until mysqladmin ping -h localhost --silent; do
+    until mysqladmin ping --socket=/var/run/mysqld/mysqld.sock --silent; do
         sleep 2
     done
 
     echo "Setting root password..."
-    mysql -u root <<EOF
+    mysql --socket=/var/run/mysqld/mysqld.sock -u root <<EOF
 ALTER USER 'root'@'localhost' IDENTIFIED BY '${MYSQL_ROOT_PASSWORD}';
 DELETE FROM mysql.user WHERE User='';
 DELETE FROM mysql.user WHERE User='root' AND Host NOT IN ('localhost', '127.0.0.1', '::1');
@@ -30,10 +30,10 @@ EOF
 
     if [ -f /docker-entrypoint-initdb.d/init.sql ];then
         echo "Running initialization SQL..."
-        mysql -u root -p"${MYSQL_ROOT_PASSWORD}" < /docker-entrypoint-initdb.d/init.sql
+        mysql --socket=/var/run/mysqld/mysqld.sock -u root -p"${MYSQL_ROOT_PASSWORD}" < /docker-entrypoint-initdb.d/init.sql
     fi
 
-    if ! kill -s TERM "$pid" || ! wait "$pid"; then
+    if ! kill -s TERM "$PID" || ! wait "$PID"; then
         echo "MariaDB initialization process failed"
         exit 1
     fi
@@ -42,4 +42,4 @@ EOF
 fi
 
 echo "Starting MariaDB..."
-exec mysqld_safe
+exec mysqld --user=mysql
