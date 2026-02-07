@@ -1,5 +1,64 @@
 #!/bin/bash
 
+set -e
+
+MYSQL_ROOT_PASSWORD=$(cat "$MYSQL_ROOT_PASSWORD_FILE")
+
+DATADIR="/var/lib/mysql"
+SOCKET="/run/mysqld/mysqld.sock"
+
+echo "▶ MariaDB entrypoint starting"
+
+# ------------------------------------------------------------------
+# INIT PHASE (first run only)
+# ------------------------------------------------------------------
+if [ ! -d "$DATADIR/mysql" ]; then
+    echo "▶ Initializing database directory"
+
+    chown -R mysql:mysql "$DATADIR"
+    mysql_install_db --user=mysql --datadir="$DATADIR"
+
+    echo "▶ Starting MariaDB (socket only, no TCP)"
+    mysqld --user=mysql \
+           --datadir="$DATADIR" \
+           --skip-networking \
+           --socket="$SOCKET" &
+    pid="$!"
+
+    echo "▶ Waiting for socket to be ready"
+    until mysqladmin --socket="$SOCKET" ping --silent; do
+        sleep 1
+    done
+
+    echo "▶ Setting root password and basic security"
+    mysql --socket="$SOCKET" -u root <<EOF
+ALTER USER 'root'@'localhost' IDENTIFIED BY '${MYSQL_ROOT_PASSWORD}';
+DELETE FROM mysql.user WHERE User='';
+DROP DATABASE IF EXISTS test;
+DELETE FROM mysql.db WHERE Db='test' OR Db='test\\_%';
+FLUSH PRIVILEGES;
+EOF
+
+    if [ -f /docker-entrypoint-initdb.d/init.sql ]; then
+        echo "▶ Running init.sql"
+        mysql --socket="$SOCKET" -u root -p"${MYSQL_ROOT_PASSWORD}" \
+            < /docker-entrypoint-initdb.d/init.sql
+    fi
+
+    echo "▶ Shutting down temporary MariaDB"
+    mysqladmin --socket="$SOCKET" -u root -p"${MYSQL_ROOT_PASSWORD}" shutdown
+    wait "$pid"
+
+    echo "▶ Database initialization completed"
+fi
+
+# ------------------------------------------------------------------
+# RUN PHASE
+# ------------------------------------------------------------------
+echo "▶ Starting MariaDB (TCP enabled)"
+exec mysqld --user=mysql --datadir="$DATADIR"
+
+
 # bash /usr/local/bin/init.sh
 
 # mysqld_safe &
@@ -19,49 +78,49 @@
 
 # wait
 
-export MYSQL_ROOT_PASSWORD=$(cat "$MYSQL_ROOT_PASSWORD_FILE")
-echo "my root pwd is : ${MYSQL_ROOT_PASSWORD}"
+# export MYSQL_ROOT_PASSWORD=$(cat "$MYSQL_ROOT_PASSWORD_FILE")
+# echo "my root pwd is : ${MYSQL_ROOT_PASSWORD}"
 
-if [ ! -d "/var/lib/mysql/mysql" ]; then
+# if [ ! -d "/var/lib/mysql/mysql" ]; then
 
-    echo "Initializing database..."
-    mysql_install_db --user=mysql --datadir=/var/lib/mysql
+#     echo "Initializing database..."
+#     mysql_install_db --user=mysql --datadir=/var/lib/mysql
 
-    bash /usr/local/bin/init.sh
+#     bash /usr/local/bin/init.sh
 
-    mysqld_safe --skip-networking &
-    PID=$!
+#     mysqld_safe --skip-networking &
+#     PID=$!
 
-    echo "Waiting for MariaDB to start..."
-    until mysqladmin ping -h localhost --silent; do
-        sleep 2
-    done
+#     echo "Waiting for MariaDB to start..."
+#     until mysqladmin ping -h localhost --silent; do
+#         sleep 2
+#     done
 
-    echo "Setting root password..."
-    mysql -u root <<EOF
-ALTER USER 'root'@'localhost' IDENTIFIED BY '${MYSQL_ROOT_PASSWORD}';
-DELETE FROM mysql.user WHERE User='';
-DELETE FROM mysql.user WHERE User='root' AND Host NOT IN ('localhost', '127.0.0.1', '::1');
-DROP DATABASE IF EXISTS test;
-DELETE FROM mysql.db WHERE Db='test' OR Db='test\\_%';
-FLUSH PRIVILEGES;
-EOF
+#     echo "Setting root password..."
+#     mysql -u root <<EOF
+# ALTER USER 'root'@'localhost' IDENTIFIED BY '${MYSQL_ROOT_PASSWORD}';
+# DELETE FROM mysql.user WHERE User='';
+# DELETE FROM mysql.user WHERE User='root' AND Host NOT IN ('localhost', '127.0.0.1', '::1');
+# DROP DATABASE IF EXISTS test;
+# DELETE FROM mysql.db WHERE Db='test' OR Db='test\\_%';
+# FLUSH PRIVILEGES;
+# EOF
 
-    if [ -f /docker-entrypoint-initdb.d/init.sql ];then
-        echo "Running initialization SQL..."
-        mysql -u root -p"${MYSQL_ROOT_PASSWORD}" < /docker-entrypoint-initdb.d/init.sql
-    fi
+#     if [ -f /docker-entrypoint-initdb.d/init.sql ];then
+#         echo "Running initialization SQL..."
+#         mysql -u root -p"${MYSQL_ROOT_PASSWORD}" < /docker-entrypoint-initdb.d/init.sql
+#     fi
 
-    if ! kill -s TERM "$PID" || ! wait "$PID"; then
-        echo "MariaDB initialization process failed"
-        exit 1
-    fi
+#     if ! kill -s TERM "$PID" || ! wait "$PID"; then
+#         echo "MariaDB initialization process failed"
+#         exit 1
+#     fi
 
-    echo "Database initialized successfully"
-fi
+#     echo "Database initialized successfully"
+# fi
 
-echo "Starting MariaDB..."
-exec mysqld_safe
+# echo "Starting MariaDB..."
+# exec mysqld_safe
 
 
 # export MYSQL_ROOT_PASSWORD=$(cat "$MYSQL_ROOT_PASSWORD_FILE")
