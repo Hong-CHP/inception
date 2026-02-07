@@ -2,7 +2,9 @@
 
 # set -e
 
-# MYSQL_ROOT_PASSWORD=$(cat "$MYSQL_ROOT_PASSWORD_FILE")
+# MYSQL_ROOT_PASSWORD=$(cat "$MYSQL_ROOT_PASSWORD_FILE"
+#unset MYSQL_HOST
+#MYSQL_ROOT_PASSWORD=$(cat "$MYSQL_ROOT_PASSWORD_FILE")
 
 # DATADIR="/var/lib/mysql"
 # SOCKET="/run/mysqld/mysqld.sock"
@@ -166,3 +168,4 @@ fi
 
 echo "Starting MariaDB..."
 exec mysqld --user=mysql
+
