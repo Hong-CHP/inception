@@ -17,4 +17,6 @@ RUN chmod +x /usr/local/bin/init.sh
 COPY tools/entrypoint.sh /usr/local/bin/
 RUN chmod +x /usr/local/bin/entrypoint.sh
 
+RUN mkdir -p /var/lib/mysql && chown -R mysql:mysql /var/lib/mysql
+
 CMD ["/usr/local/bin/entrypoint.sh"]
