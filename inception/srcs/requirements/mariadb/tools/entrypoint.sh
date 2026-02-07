@@ -153,10 +153,10 @@ if [ ! -d "/var/lib/mysql/mysql" ]; then
 # FLUSH PRIVILEGES;
 # EOF
 
-    if [ -f /docker-entrypoint-initdb.d/init.sql ];then
-        echo "Running initialization SQL..."
-        mysql --socket=/var/run/mysqld/mysqld.sock -u root -p"${MYSQL_ROOT_PASSWORD}" < /docker-entrypoint-initdb.d/init.sql
-    fi
+    # if [ -f /docker-entrypoint-initdb.d/init.sql ];then
+    #     echo "Running initialization SQL..."
+    #     mysql --socket=/var/run/mysqld/mysqld.sock -u root -p"${MYSQL_ROOT_PASSWORD}" < /docker-entrypoint-initdb.d/init.sql
+    # fi
 
     if ! kill -s TERM "$PID" || ! wait "$PID"; then
         echo "MariaDB initialization process failed"
