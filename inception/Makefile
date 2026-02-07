@@ -15,7 +15,7 @@ down:
 clean:
 	$(COMPOSE) down -v
 
-fclean:
+fclean: clean
 	sudo rm -rf /home/hporta-c/data/mariadb
 	sudo rm -rf /home/hporta-c/data/wordpress
 	docker system prune -af
