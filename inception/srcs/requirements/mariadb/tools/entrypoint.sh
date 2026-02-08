@@ -209,8 +209,10 @@ if [ ! -d "/var/lib/mysql/mysql" ]; then
     # 使用环境变量设置 root 密码
     mysql -uroot --socket=/var/run/mysqld/mysqld.sock <<EOF
         USE mysql;
-        UPDATE user SET password=PASSWORD('${MYSQL_ROOT_PASSWORD}') WHERE user='root';
-        UPDATE user SET plugin='mysql_native_password' WHERE user='root';
+        ALTER USER 'root'@'localhost' IDENTIFIED BY '${MYSQL_ROOT_PASSWORD}';
+        DELETE FROM mysql.user WHERE user = '';
+        DROP DATABASE IF EXISTS test;
+        DELETE FROM mysql.db WHERE Db='test' OR Db='test\\_%';
         FLUSH PRIVILEGES;
 EOF
     

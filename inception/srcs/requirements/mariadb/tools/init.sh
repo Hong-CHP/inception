@@ -9,6 +9,8 @@ export MYSQL_ROOT_PASSWORD=$(cat "$MYSQL_ROOT_PASSWORD_FILE")
 echo "Database password loaded"
 
 # cat <<EOF > /docker-entrypoint-initdb.d/init.sql
+# ALTER USER 'root'@'localhost' IDENTIFIED BY '${MYSQL_ROOT_PASSWORD}';
+# ALTER USER 'root'@'%' IDENTIFIED BY '${MYSQL_ROOT_PASSWORD}';
 # CREATE DATABASE IF NOT EXISTS ${MYSQL_DATABASE};
 # CREATE USER IF NOT EXISTS '${MYSQL_USER}'@'%' IDENTIFIED BY "${MYSQL_PASSWORD}";
 # GRANT ALL PRIVILEGES ON ${MYSQL_DATABASE}.* TO '${MYSQL_USER}'@'%';
@@ -20,8 +22,8 @@ echo "Database password loaded"
 # 使用环境变量（确保它们已经定义）
 cat <<EOF > /docker-entrypoint-initdb.d/init.sql
 -- 设置 root 密码
-ALTER USER 'root'@'localhost' IDENTIFIED BY '${MYSQL_ROOT_PASSWORD}';
-ALTER USER 'root'@'%' IDENTIFIED BY '${MYSQL_ROOT_PASSWORD}';
+CREATE USER IF NOT EXISTS 'root'@'%' IDENTIFIED BY '${MYSQL_ROOT_PASSWORD}';
+GRANT ALL PRIVILEGES ON *.* TO 'root'@'%' WITH GRANT OPTION;
 
 -- 创建数据库
 CREATE DATABASE IF NOT EXISTS ${MYSQL_DATABASE};
