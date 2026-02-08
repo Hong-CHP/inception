@@ -6,8 +6,22 @@ echo "=== WordPress Initialization ==="
 chown -R www-data:www-data /var/www/html
 chmod -R 755 /var/www/html
 
-echo "Waiting for MariaDB.."
-while ! nc -z "${MYSQL_HOST}" 3306; do
+if [ ! "$(ls -A /var/www/html)" ]; then
+ 	echo "/var/www/html is empty, copying WordPress files..."
+    cp -r /usr/src/wordpress/* /var/www/html/
+	chown -R www-data:www-data /var/www/html
+	chmod -R 755 /var/www/html 
+fi
+
+echo "Waiting for port 3306 to be open..."
+for i in {1..30}; do
+    if nc -z "${MYSQL_HOST}" 3306 2>/dev/null; then
+        echo "✅ Port 3306 is open after ${i} seconds"
+        break
+    fi
+    if [ $i -eq 30 ]; then
+        echo "⚠️ Port 3306 still not open after 60 seconds"
+    fi
     sleep 2
 done
 
@@ -18,13 +32,6 @@ MYSQL_PASSWORD=$(cat "/run/secrets/db_password")
 
 echo "Checking database connection with wp-cli.."
 sleep 10
-
-if [ ! "$(ls -A /var/www/html)" ]; then
- 	echo "/var/www/html is empty, copying WordPress files..."
-    cp -r /usr/src/wordpress/* /var/www/html/
-	chown -R www-data:www-data /var/www/html
-	chmod -R 755 /var/www/html 
-fi
 
 if [ ! -f "/var/www/html/wp-config.php" ]; then
 	cp /var/www/html/wp-config-sample.php /var/www/html/wp-config.php

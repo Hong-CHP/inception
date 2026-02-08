@@ -70,12 +70,14 @@ In `Dockerfile`, ENV define, for example `ENV MYSQL_PASSWORD_FILE /run/secrets/d
 ### II. WordPress:
 1. **Dockerfile**: 
 	- Base from debian:bookworm-slim;
-	- update system then install `wget`, `php-fpm`, `php-mysql`
-	- `mkdir -p /var/www/html/`
+	- update system then install `wget`, `curl`, `php-fpm`, `php-mysql`
+	- `mkdir -p /usr/src/wordpress`
 	- wget wordpress website content
-	- tar wordpress package under directory /var/www/html/
+	- tar wordpress package under directory /usr/src/wordpress
 	- remove all install package
 	- copy entrypoint script in `/usr/local/bin` and make sure the script can be executed
+	- curl wp-cli.phar command tools in /usr/local/bin/wp make sure executable for using commands in side of wordpress container to config user 
+	- copy www.conf, entrypoint.sh
 	- execute cmd `/usr/local/bin/entrypoint.sh` append `/usr/sbin/php-fpm8.2 -F`
 2. **entrypoint.sh**
 	copy a standrad file /var/www/html/wp-config-sample.php and change content inside of copy file, instead by ENV
