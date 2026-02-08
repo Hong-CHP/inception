@@ -19,22 +19,12 @@ MYSQL_PASSWORD=$(cat "/run/secrets/db_password")
 echo "Checking database connection with wp-cli.."
 sleep 10
 
-if [ ! -f "/var/www/html/wp-settings.php" ]; then
+if [ ! "$(ls -A /var/www/html)" ]; then
+ 	echo "/var/www/html is empty, copying WordPress files..."
     cp -r /usr/src/wordpress/* /var/www/html/
 	chown -R www-data:www-data /var/www/html
+	chmod -R 755 /var/www/html 
 fi
-
-# if [ ! -f "/var/www/html/wp-config.php" ]; then
-#     echo "Creating wp-config.php..."
-#     wp config create \
-#         --dbname="${MYSQL_DATABASE}" \
-#         --dbuser="${MYSQL_USER}" \
-#         --dbpass="${MYSQL_PASSWORD}" \
-#         --dbhost="${MYSQL_HOST}" \
-#         --locale=en_US \
-#         --path=/var/www/html \
-#         --allow-root
-# fi
 
 if [ ! -f "/var/www/html/wp-config.php" ]; then
 	cp /var/www/html/wp-config-sample.php /var/www/html/wp-config.php

@@ -51,16 +51,20 @@ In `Dockerfile`, ENV define, for example `ENV MYSQL_PASSWORD_FILE /run/secrets/d
 	- execute cmd `/usr/local/bin/entrypoint.sh`
 2. **init.sh**
 	- export password files as environment variables, because these contents are not stocken in .env as environment variables, there are in /secrets, and when docker run, docker get invisibly in /run/secrets
-
-3. **entrypoint.sh**
-	need be initialized when start it first time, and can't be reinitialized repeatly when run it again. We need create this logic:
-	"if adress is not binded:
-		bind adress"
+	- create an init.sql, heredoc inside :
+		- create root with root password, and grant all privileges on all databases to root
+		- create database(wordpress)
+		- create mysql_user(wp_user) with user password, and grant all privileges wordpress database to wp_user
+3. **entrypoint.sh**(the most complicated configuration)
+	- make sure the directory are exist and has right (for socket)
+	- get start init.sh
+	- get root password again
+	-  need be initialized when start it first time, and can't be reinitialized repeatly when run it again. We need create this logic:
 	"if `/var/lib/mysql/myqsl` is empty:
 		initial database
-		create database
-		create user
-		give permission
+		create a pid listen mysqld.sock to set up
+		executing init.sql
+		stop pid
 	start mariadb"
 
 ### II. WordPress:
