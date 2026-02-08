@@ -1,5 +1,3 @@
-#!/bin/bash
-
 mkdir -p /docker-entrypoint-initdb.d
 
 while [ ! -f /run/secrets/db_password ]; do
