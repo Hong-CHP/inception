@@ -224,9 +224,14 @@ EOF
     
     # 停止临时服务
     echo "Stopping temporary MariaDB server..."
-    kill ${MYSQL_PID} || echo "Kill failed, maybe the process already stopped"
-    wait ${MYSQL_PID} 2>/dev/null || echo "Wait failed, but continuing"
-    echo "Temporary MariaDB server stopped."
+    if mysqladmin --socket=/var/run/mysqld/mysqld.sock -uroot -p"${MYSQL_ROOT_PASSWORD}" shutdown; then
+        echo "Temporary server shutdown gracefully."
+    else
+        echo "Graceful shutdown failed, killing the process."
+        kill ${MYSQL_PID} 2>/dev/null || true
+        wait ${MYSQL_PID} 2>/dev/null || true
+    fi
+echo "Temporary MariaDB server stopped."
 fi
 
 echo "Starting MariaDB server..."
