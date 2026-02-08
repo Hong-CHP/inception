@@ -172,7 +172,7 @@
 # exec mysqld --user=mysql
 
 
-#------------------------v4-----------------------
+#------------------------v4: finally works version!!!-----------------------
 set -e
 
 echo "Starting MariaDB setup..."
