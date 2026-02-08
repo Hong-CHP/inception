@@ -1,5 +1,6 @@
 #!/bin/bash
 
+#------------------------v1-----------------------
 # set -e
 
 # MYSQL_ROOT_PASSWORD=$(cat "$MYSQL_ROOT_PASSWORD_FILE"
@@ -60,26 +61,27 @@
 # echo "▶ Starting MariaDB (TCP enabled)"
 # exec mysqld --user=mysql --datadir="$DATADIR"
 
+#------------------------v2-----------------------
+# bash /usr/local/bin/init.sh
 
-bash /usr/local/bin/init.sh
+# mysqld_safe &
 
-mysqld_safe &
+# export MYSQL_ROOT_PASSWORD=$(cat "$MYSQL_ROOT_PASSWORD_FILE")
+# echo "my root pwd is : ${MYSQL_ROOT_PASSWORD}"
 
-export MYSQL_ROOT_PASSWORD=$(cat "$MYSQL_ROOT_PASSWORD_FILE")
-echo "my root pwd is : ${MYSQL_ROOT_PASSWORD}"
+# echo "Waiting for MariaDB to start..."
+# until mysqladmin ping -h localhost --silent; do
+#     sleep 2
+# done
 
-echo "Waiting for MariaDB to start..."
-until mysqladmin ping -h localhost --silent; do
-    sleep 2
-done
+# if [ -f /docker-entrypoint-initdb.d/init.sql ]; then
+#     echo "Running initialization SQL..."
+#     mysql -u root -p"${MYSQL_ROOT_PASSWORD}" < /docker-entrypoint-initdb.d/init.sql
+# fi
 
-if [ -f /docker-entrypoint-initdb.d/init.sql ]; then
-    echo "Running initialization SQL..."
-    mysql -u root -p"${MYSQL_ROOT_PASSWORD}" < /docker-entrypoint-initdb.d/init.sql
-fi
+# wait
 
-wait
-
+#------------------------v3-----------------------
 # export MYSQL_ROOT_PASSWORD=$(cat "$MYSQL_ROOT_PASSWORD_FILE")
 # echo "my root pwd is : ${MYSQL_ROOT_PASSWORD}"
 
@@ -124,7 +126,7 @@ wait
 # echo "Starting MariaDB..."
 # exec mysqld_safe
 
-
+#------------------------v4-----------------------
 # export MYSQL_ROOT_PASSWORD=$(cat "$MYSQL_ROOT_PASSWORD_FILE")
 # echo "my root pwd is : ${MYSQL_ROOT_PASSWORD}"
 
@@ -169,3 +171,58 @@ wait
 # echo "Starting MariaDB..."
 # exec mysqld --user=mysql
 
+
+#------------------------v4-----------------------
+set -e
+
+echo "Starting MariaDB setup..."
+
+# 确保目录存在且有正确权限
+mkdir -p /var/run/mysqld
+chown -R mysql:mysql /var/run/mysqld
+chown -R mysql:mysql /var/lib/mysql
+
+# 生成初始化脚本（使用环境变量）
+bash /generate_init.sh
+
+export MYSQL_ROOT_PASSWORD=$(cat "$MYSQL_ROOT_PASSWORD_FILE")
+echo "my root pwd is : ${MYSQL_ROOT_PASSWORD}"
+
+# 如果数据库未初始化，则进行初始化
+if [ ! -d "/var/lib/mysql/mysql" ]; then
+    echo "Initializing MariaDB database..."
+    
+    # 初始化数据库
+    mysql_install_db --user=mysql --datadir=/var/lib/mysql
+    
+    # 启动临时服务
+    mysqld_safe --skip-networking --socket=/var/run/mysqld/mysqld.sock &
+    MYSQL_PID=$!
+    
+    # 等待MySQL启动
+    sleep 15
+    
+    echo "Setting up initial database..."
+    
+    # 使用环境变量设置 root 密码
+    mysql -uroot <<EOF
+        USE mysql;
+        UPDATE user SET password=PASSWORD('${MYSQL_ROOT_PASSWORD}') WHERE user='root';
+        UPDATE user SET plugin='mysql_native_password' WHERE user='root';
+        FLUSH PRIVILEGES;
+EOF
+    
+    # 执行初始化SQL
+    if [ -f "/docker-entrypoint-initdb.d/init.sql" ]; then
+        echo "Executing init.sql..."
+        mysql -uroot -p"${MYSQL_ROOT_PASSWORD}" < /docker-entrypoint-initdb.d/init.sql
+    fi
+    
+    # 停止临时服务
+    kill ${MYSQL_PID}
+    wait ${MYSQL_PID}
+fi
+
+echo "Starting MariaDB server..."
+# 最终启动服务
+exec mysqld_safe --user=mysql --datadir=/var/lib/mysql
