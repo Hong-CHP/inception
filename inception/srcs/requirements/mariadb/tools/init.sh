@@ -7,6 +7,7 @@ while [ ! -f /run/secrets/db_password ]; do
 done
 
 export MYSQL_PASSWORD=$(cat "$MYSQL_PASSWORD_FILE")
+export MYSQL_ROOT_PASSWORD=$(cat "$MYSQL_ROOT_PASSWORD_FILE")
 echo "Database password loaded"
 
 # cat <<EOF > /docker-entrypoint-initdb.d/init.sql

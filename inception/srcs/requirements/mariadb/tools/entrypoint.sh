@@ -183,7 +183,7 @@ chown -R mysql:mysql /var/run/mysqld
 chown -R mysql:mysql /var/lib/mysql
 
 # 生成初始化脚本（使用环境变量）
-bash /generate_init.sh
+bash /usr/local/bin/init.sh
 
 export MYSQL_ROOT_PASSWORD=$(cat "$MYSQL_ROOT_PASSWORD_FILE")
 echo "my root pwd is : ${MYSQL_ROOT_PASSWORD}"
@@ -196,16 +196,18 @@ if [ ! -d "/var/lib/mysql/mysql" ]; then
     mysql_install_db --user=mysql --datadir=/var/lib/mysql
     
     # 启动临时服务
-    mysqld_safe --skip-networking --socket=/var/run/mysqld/mysqld.sock &
+    mysqld_safe --datadir=/var/lib/mysql --skip-networking --socket=/var/run/mysqld/mysqld.sock &
     MYSQL_PID=$!
     
     # 等待MySQL启动
-    sleep 15
+    until mysqladmin ping --socket=/var/run/mysqld/mysqld.sock --silent; do
+	sleep 2
+    done
     
     echo "Setting up initial database..."
     
     # 使用环境变量设置 root 密码
-    mysql -uroot <<EOF
+    mysql -uroot --socket=/var/run/mysqld/mysqld.sock <<EOF
         USE mysql;
         UPDATE user SET password=PASSWORD('${MYSQL_ROOT_PASSWORD}') WHERE user='root';
         UPDATE user SET plugin='mysql_native_password' WHERE user='root';
@@ -215,7 +217,7 @@ EOF
     # 执行初始化SQL
     if [ -f "/docker-entrypoint-initdb.d/init.sql" ]; then
         echo "Executing init.sql..."
-        mysql -uroot -p"${MYSQL_ROOT_PASSWORD}" < /docker-entrypoint-initdb.d/init.sql
+        mysql -uroot --socket=/var/run/mysqld/mysqld.sock -p"${MYSQL_ROOT_PASSWORD}" < /docker-entrypoint-initdb.d/init.sql
     fi
     
     # 停止临时服务
