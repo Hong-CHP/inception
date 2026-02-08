@@ -44,12 +44,15 @@ In `Dockerfile`, ENV define, for example `ENV MYSQL_PASSWORD_FILE /run/secrets/d
 1. **Dockerfile**: 
 	- Base from debian:bookworm-slim;
 	- update system then install `mariadb-server` and `mariadb-client`, remove all install package
-	- mkdir `/var/run/mysqld` where stocks a mysqld.sock
+	- mkdir `/var/run/mysqld` where stocks a mysqld.sock, and `/var/lib/mysql` stocks all mysql data
 	- ensure mysql user have permission to read `/var/run/mysqld` and `/var/lib/mysql`
-	- copy entrypoint script in `/usr/local/bin` and make sure the script can be executed
+	- copy init.sh entrypoint.sh scripts in `/usr/local/bin` and make sure the script can be executed
 	- expose 3306 port
-	- execute cmd `/usr/local/bin/entrypoint.sh` append `mysqld`
-2. **entrypoint.sh**
+	- execute cmd `/usr/local/bin/entrypoint.sh`
+2. **init.sh**
+	- export password files as environment variables, because these contents are not stocken in .env as environment variables, there are in /secrets, and when docker run, docker get invisibly in /run/secrets
+
+3. **entrypoint.sh**
 	need be initialized when start it first time, and can't be reinitialized repeatly when run it again. We need create this logic:
 	"if adress is not binded:
 		bind adress"

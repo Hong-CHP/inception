@@ -38,6 +38,8 @@ services:
         condition: service_healthy
     env_file:
       - .env
+    environment:
+      - MYSQL_HOST=mariadb
     secrets:
       - db_password
       - credentials
