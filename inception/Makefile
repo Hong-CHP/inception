@@ -9,6 +9,9 @@ up:
 	sudo chown -R 33:33 /home/hporta-c/data/wordpress
 	$(COMPOSE) up -d --build
 
+stop:
+	$(COMPOSE) stop
+
 down:
 	$(COMPOSE) down
 
@@ -18,7 +21,8 @@ clean:
 fclean: clean
 	sudo rm -rf /home/hporta-c/data/mariadb
 	sudo rm -rf /home/hporta-c/data/wordpress
-	docker system prune -af
+	$(COMPOSE) images -q | xargs -r docker rmi -f
+	docker buildx prune -f --filter "label=com.docker.compose.project=inception"
 
 re: fclean all
 
