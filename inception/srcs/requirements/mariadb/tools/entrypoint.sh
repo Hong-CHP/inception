@@ -236,4 +236,4 @@ fi
 
 echo "Starting MariaDB server..."
 # 最终启动服务
-exec mariadb --user=mysql --datadir=/var/lib/mysql
+exec mariadbd --user=mysql --datadir=/var/lib/mysql
