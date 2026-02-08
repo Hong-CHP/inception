@@ -64,7 +64,7 @@ In `Dockerfile`, ENV define, for example `ENV MYSQL_PASSWORD_FILE /run/secrets/d
 		initial database
 		create a pid listen mysqld.sock to set up
 		executing init.sql
-		stop pid
+		stop pid as mysqladmin through socket
 	start mariadb"
 
 ### II. WordPress:
@@ -79,8 +79,19 @@ In `Dockerfile`, ENV define, for example `ENV MYSQL_PASSWORD_FILE /run/secrets/d
 	- curl wp-cli.phar command tools in /usr/local/bin/wp make sure executable for using commands in side of wordpress container to config user 
 	- copy www.conf, entrypoint.sh
 	- execute cmd `/usr/local/bin/entrypoint.sh` append `/usr/sbin/php-fpm8.2 -F`
+2. **conf/www.conf**
+	- loading php and read php.ini and extension is too slow, so we need fastcgi_pass process pool
+	- php-fpm user is www-data to ensure permission for /var/www/html
+	- use dynamic mode to cross or decrease according to need 
 2. **entrypoint.sh**
-	copy a standrad file /var/www/html/wp-config-sample.php and change content inside of copy file, instead by ENV
+	- make sure www-data user have permission
+	- copy files from /usr/src/wordpress to /var/www/html, give permission
+	- waiting port mariadb 3306 open
+	- use /var/www/html/wp-config.php to config how wordpress connects mariadb
+	- check is wordpress tab is ok, if not, config then
+	- take all user data from credentials file
+	- root install wordpress
+	- root create user
 
 ### III. Nginx
 1. **Dockerfile**:
@@ -122,12 +133,15 @@ In `Dockerfile`, ENV define, for example `ENV MYSQL_PASSWORD_FILE /run/secrets/d
 `$ docker compose down`
 - clean container, network and remove named volumes declared in the "volumes" section of the Compose file and anonymous volumes attached to containers
 `$ docker compose down -v`
+- remove all images, build cache
+`$ docker system prune -af`
 
 **With Make**
 - make all: make up
 - make up: build images and lauch it in detached mode
 - make down: remove container and network
 - make clean: remove container, network and volumes
+- make fclean: remove container, network and bind volumes, cache and all images
 - make re: make clean then make up
 
 ## Manage the containers and volumes
@@ -140,3 +154,4 @@ When container or images are removed, the volumes mounted in host directory will
 When we build a new image and a new container
 - volumes defined in docker-compose.yml can cover container volumes's path
 - a script can resolv and make sure an exitant directory or file would not be reinitialized by a new one
+- when rebuild image totally, make sure all data is remove on host

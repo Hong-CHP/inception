@@ -16,11 +16,11 @@ fi
 echo "Waiting for port 3306 to be open..."
 for i in {1..30}; do
     if nc -z "${MYSQL_HOST}" 3306 2>/dev/null; then
-        echo "✅ Port 3306 is open after ${i} seconds"
+        echo "Port 3306 is open after ${i} seconds"
         break
     fi
     if [ $i -eq 30 ]; then
-        echo "⚠️ Port 3306 still not open after 60 seconds"
+        echo "Port 3306 still not open after 60 seconds"
     fi
     sleep 2
 done

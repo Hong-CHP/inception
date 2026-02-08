@@ -225,7 +225,7 @@ EOF
     # 停止临时服务
     echo "Stopping temporary MariaDB server..."
     if mysqladmin --socket=/var/run/mysqld/mysqld.sock -uroot -p"${MYSQL_ROOT_PASSWORD}" shutdown; then
-        echo "Temporary server shutdown gracefully."
+        echo "Temporary server shutdown."
     else
         echo "Graceful shutdown failed, killing the process."
         kill ${MYSQL_PID} 2>/dev/null || true
@@ -236,4 +236,4 @@ fi
 
 echo "Starting MariaDB server..."
 # 最终启动服务
-exec mysqld_safe --user=mysql --datadir=/var/lib/mysql
+exec mariadb --user=mysql --datadir=/var/lib/mysql

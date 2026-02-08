@@ -57,3 +57,4 @@ For more detailed administrative or technical instructions, please refer to [USE
   - Designing the logic for the `Makefile` to ensure proper container orchestration.
   - Refined the ssl configuration for the Nginx `nginx.conf`.
   - helps to write a Makefile call docker-compose.yml
+  - **Deepseek** helps me to debug mariadb since one week, I met a big problem when create user and root, create failed, cannot access or cannot connect, I have done more than 4 versions to find finally problem! In docker-compose.yml, if you take a environment variable MYSQL_HOST=mariadb, it means that mysql will try to connect mysqld by host mariadb, but not from socket! As we stop connection and use socket to config user! And we can never config user without socket! Anyway, it helps me and teaches me how to find the problem and how it works actually!!! It was really graceful!

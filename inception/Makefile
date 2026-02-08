@@ -1,12 +1,12 @@
-COMPOSE = docker compose -f srcs/docker-compose.yml
+COMPOSE = docker compose -p inception -f srcs/docker-compose.yml
 
 all: up
 
 up:
 	mkdir -p /home/hporta-c/data/mariadb
 	mkdir -p /home/hporta-c/data/wordpress
-	chown -R 999:999 /home/hporta-c/data/mariadb
-	chown -R 33:33 /home/hporta-c/data/wordpress
+	sudo chown -R 999:999 /home/hporta-c/data/mariadb
+	sudo chown -R 33:33 /home/hporta-c/data/wordpress
 	$(COMPOSE) up -d --build
 
 down:
