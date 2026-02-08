@@ -223,8 +223,10 @@ EOF
     fi
     
     # 停止临时服务
-    kill ${MYSQL_PID}
-    wait ${MYSQL_PID}
+    echo "Stopping temporary MariaDB server..."
+    kill ${MYSQL_PID} || echo "Kill failed, maybe the process already stopped"
+    wait ${MYSQL_PID} 2>/dev/null || echo "Wait failed, but continuing"
+    echo "Temporary MariaDB server stopped."
 fi
 
 echo "Starting MariaDB server..."
