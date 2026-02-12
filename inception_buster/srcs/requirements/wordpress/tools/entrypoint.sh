@@ -6,12 +6,12 @@ echo "=== WordPress Initialization ==="
 chown -R www-data:www-data /var/www/html
 chmod -R 755 /var/www/html
 
-if [ ! "$(ls -A /var/www/html)" ]; then
- 	echo "/var/www/html is empty, copying WordPress files..."
-    cp -r /usr/src/wordpress/* /var/www/html/
-	chown -R www-data:www-data /var/www/html
-	chmod -R 755 /var/www/html 
-fi
+#if [ ! "$(ls -A /var/www/html)" ]; then
+# 	echo "/var/www/html is empty, copying WordPress files..."
+#    cp -r /usr/src/wordpress/* /var/www/html/
+#	chown -R www-data:www-data /var/www/html
+#	chmod -R 755 /var/www/html 
+#fi
 
 echo "Waiting for port 3306 to be open..."
 for i in {1..30}; do
