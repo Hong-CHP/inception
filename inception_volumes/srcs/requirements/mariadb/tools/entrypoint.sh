@@ -272,7 +272,7 @@ done
 echo "Setting up initial database..."
 
 # 使用环境变量设置 root 密码
-mysql -uroot --socket=/var/run/mysqld/mysqld.sock <<EOF
+mysql -uroot -p"${MYSQL_ROOT_PASSWORD}" --socket=/var/run/mysqld/mysqld.sock <<EOF
 USE mysql;
 ALTER USER 'root'@'localhost' IDENTIFIED BY '${MYSQL_ROOT_PASSWORD}';
 DELETE FROM mysql.user WHERE user = '';
