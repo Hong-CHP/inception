@@ -173,70 +173,70 @@
 
 
 #------------------------v5: finally works version!!!-----------------------
-set -e
+# set -e
 
-echo "Starting MariaDB setup..."
+# echo "Starting MariaDB setup..."
 
-# 确保目录存在且有正确权限
-mkdir -p /var/run/mysqld
-chown -R mysql:mysql /var/run/mysqld
-chown -R mysql:mysql /var/lib/mysql
+# # 确保目录存在且有正确权限
+# mkdir -p /var/run/mysqld
+# chown -R mysql:mysql /var/run/mysqld
+# chown -R mysql:mysql /var/lib/mysql
 
-# 生成初始化脚本（使用环境变量）
-bash /usr/local/bin/init.sh
+# # 生成初始化脚本（使用环境变量）
+# bash /usr/local/bin/init.sh
 
-export MYSQL_ROOT_PASSWORD=$(cat "$MYSQL_ROOT_PASSWORD_FILE")
-echo "my root pwd is : ${MYSQL_ROOT_PASSWORD}"
+# export MYSQL_ROOT_PASSWORD=$(cat "$MYSQL_ROOT_PASSWORD_FILE")
+# echo "my root pwd is : ${MYSQL_ROOT_PASSWORD}"
 
-# 如果数据库未初始化，则进行初始化
-if [ ! -d "/var/lib/mysql/mysql" ]; then
-    echo "Initializing MariaDB database..."
+# # 如果数据库未初始化，则进行初始化
+# if [ ! -d "/var/lib/mysql/mysql" ]; then
+#     echo "Initializing MariaDB database..."
     
-    # 初始化数据库
-    mysql_install_db --user=mysql --datadir=/var/lib/mysql
+#     # 初始化数据库
+#     mysql_install_db --user=mysql --datadir=/var/lib/mysql
     
-    # 启动临时服务
-    mysqld_safe --datadir=/var/lib/mysql --skip-networking --socket=/var/run/mysqld/mysqld.sock &
-    MYSQL_PID=$!
+#     # 启动临时服务
+#     mysqld_safe --datadir=/var/lib/mysql --skip-networking --socket=/var/run/mysqld/mysqld.sock &
+#     MYSQL_PID=$!
     
-    # 等待MySQL启动
-    until mysqladmin ping --socket=/var/run/mysqld/mysqld.sock --silent; do
-	sleep 2
-    done
+#     # 等待MySQL启动
+#     until mysqladmin ping --socket=/var/run/mysqld/mysqld.sock --silent; do
+# 	sleep 2
+#     done
     
-    echo "Setting up initial database..."
+#     echo "Setting up initial database..."
     
-    # 使用环境变量设置 root 密码
-    mysql -uroot --socket=/var/run/mysqld/mysqld.sock <<EOF
-        USE mysql;
-        ALTER USER 'root'@'localhost' IDENTIFIED BY '${MYSQL_ROOT_PASSWORD}';
-        DELETE FROM mysql.user WHERE user = '';
-        DROP DATABASE IF EXISTS test;
-        DELETE FROM mysql.db WHERE Db='test' OR Db='test\\_%';
-        FLUSH PRIVILEGES;
-EOF
+#     # 使用环境变量设置 root 密码
+#     mysql -uroot --socket=/var/run/mysqld/mysqld.sock <<EOF
+#         USE mysql;
+#         ALTER USER 'root'@'localhost' IDENTIFIED BY '${MYSQL_ROOT_PASSWORD}';
+#         DELETE FROM mysql.user WHERE user = '';
+#         DROP DATABASE IF EXISTS test;
+#         DELETE FROM mysql.db WHERE Db='test' OR Db='test\\_%';
+#         FLUSH PRIVILEGES;
+# EOF
     
-    # 执行初始化SQL
-    if [ -f "/docker-entrypoint-initdb.d/init.sql" ]; then
-        echo "Executing init.sql..."
-        mysql -uroot --socket=/var/run/mysqld/mysqld.sock -p"${MYSQL_ROOT_PASSWORD}" < /docker-entrypoint-initdb.d/init.sql
-    fi
+#     # 执行初始化SQL
+#     if [ -f "/docker-entrypoint-initdb.d/init.sql" ]; then
+#         echo "Executing init.sql..."
+#         mysql -uroot --socket=/var/run/mysqld/mysqld.sock -p"${MYSQL_ROOT_PASSWORD}" < /docker-entrypoint-initdb.d/init.sql
+#     fi
     
-    # 停止临时服务
-    echo "Stopping temporary MariaDB server..."
-    if mysqladmin --socket=/var/run/mysqld/mysqld.sock -uroot -p"${MYSQL_ROOT_PASSWORD}" shutdown; then
-        echo "Temporary server shutdown."
-    else
-        echo "Graceful shutdown failed, killing the process."
-        kill ${MYSQL_PID} 2>/dev/null || true
-        wait ${MYSQL_PID} 2>/dev/null || true
-    fi
-echo "Temporary MariaDB server stopped."
-fi
+#     # 停止临时服务
+#     echo "Stopping temporary MariaDB server..."
+#     if mysqladmin --socket=/var/run/mysqld/mysqld.sock -uroot -p"${MYSQL_ROOT_PASSWORD}" shutdown; then
+#         echo "Temporary server shutdown."
+#     else
+#         echo "Graceful shutdown failed, killing the process."
+#         kill ${MYSQL_PID} 2>/dev/null || true
+#         wait ${MYSQL_PID} 2>/dev/null || true
+#     fi
+# echo "Temporary MariaDB server stopped."
+# fi
 
-echo "Starting MariaDB server..."
-# 最终启动服务
-exec mariadbd --user=mysql --datadir=/var/lib/mysql
+# echo "Starting MariaDB server..."
+# # 最终启动服务
+# exec mariadbd --user=mysql --datadir=/var/lib/mysql
 
 #------------------------v6: try find work version with named volume!!!-----------------------
 set -e
