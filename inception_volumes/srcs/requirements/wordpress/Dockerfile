@@ -1,4 +1,4 @@
-FROM debian:bookworm-slim
+FROM debian:bullseye
 
 RUN apt update && apt install -y wget tar curl netcat-openbsd \
 		php-fpm php-mysql php-gd php-xml php-curl php-zip \
@@ -15,13 +15,13 @@ RUN curl -o /usr/local/bin/wp https://raw.githubusercontent.com/wp-cli/builds/gh
 RUN chown -R www-data:www-data /var/www/html \
     && chmod 755 /var/www/html
 
-COPY conf/www.conf /etc/php/8.2/fpm/pool.d/www.conf
+COPY conf/www.conf /etc/php/7.4/fpm/pool.d/www.conf
 
 COPY tools/entrypoint.sh /usr/local/bin/
 RUN chmod +x /usr/local/bin/entrypoint.sh
 
 EXPOSE 9000
 
-ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
+CMD ["/usr/local/bin/entrypoint.sh"]
 	
-CMD ["/usr/sbin/php-fpm8.2", "-F"]
+# CMD ["/usr/sbin/php-fpm8.2", "-F"]

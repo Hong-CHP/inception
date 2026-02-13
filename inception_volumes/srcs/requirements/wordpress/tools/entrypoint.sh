@@ -75,4 +75,4 @@ chown www-data:www-data /run/php
 
 echo "WordPress launch succesfully!"
 
-exec "$@"
+exec /usr/sbin/php-fpm7.4 -F

@@ -1,4 +1,4 @@
-FROM debian:bookworm-slim
+FROM debian:bullseye
 
 RUN apt update && apt install -y nginx openssl ca-certificates && rm -rf /var/lib/apt/lists/*
 RUN mkdir -p /etc/nginx/ssl
