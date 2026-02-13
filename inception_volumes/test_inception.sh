@@ -1,33 +1,16 @@
 #!/bin/bash
 
-echo "=== Inception Project Test ==="
-
-# 进入srcs目录
-cd srcs
-
-# 构建
-echo "2. Building containers..."
-docker compose build --no-cache
-
-# 只启动mariadb
-echo "3. Starting MariaDB..."
-docker compose up -d mariadb
-
-# 等待
-echo "4. Waiting for MariaDB to initialize..."
-sleep 40
-
 # 测试连接
 echo "5. Testing database connections..."
 echo "Testing root connection..."
-if docker compose exec mariadb mysql -u root -p"$(cat ../secrets/db_root_password.txt)" -e "SELECT 1;" 2>/dev/null; then
+if docker exec -it mariadb mysql -u root -p"$(cat ../secrets/db_root_password.txt)" -e "SELECT 1;" 2>/dev/null; then
     echo "✓ Root connection successful"
 else
     echo "✗ Root connection failed"
 fi
 
 echo "Testing wp_user connection..."
-if docker compose exec mariadb mysql -u wp_user -p"$(cat ../secrets/db_password.txt)" -e "SELECT 1;" 2>/dev/null; then
+if docker exec -it mariadb mysql -u wp_user -p"$(cat ../secrets/db_password.txt)" -e "SELECT 1;" 2>/dev/null; then
     echo "✓ wp_user connection successful"
 else
     echo "✗ wp_user connection failed"
