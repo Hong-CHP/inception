@@ -238,7 +238,7 @@
 # # 最终启动服务
 # exec mariadbd --user=mysql --datadir=/var/lib/mysql
 
-#------------------------v6: try find work version with named volume!!!-----------------------
+#------------------------v6: found work version with named volume!!!-----------------------
 set -e
 
 echo "Starting MariaDB setup..."
@@ -267,20 +267,20 @@ until mysqladmin ping --socket=/var/run/mysqld/mysqld.sock --silent; do
    sleep 2
 done
 # 如果数据库未初始化，则进行初始化
-if [ ! -d "/var/lib/mysql/mysql" ]; then
+# if [ ! -d "/var/lib/mysql/mysql" ]; then
     
-    echo "Setting up initial database..."
-    
-    # 使用环境变量设置 root 密码
-    mysql -uroot --socket=/var/run/mysqld/mysqld.sock <<EOF
-        USE mysql;
-        ALTER USER 'root'@'localhost' IDENTIFIED BY '${MYSQL_ROOT_PASSWORD}';
-        DELETE FROM mysql.user WHERE user = '';
-        DROP DATABASE IF EXISTS test;
-        DELETE FROM mysql.db WHERE Db='test' OR Db='test\\_%';
-        FLUSH PRIVILEGES;
+echo "Setting up initial database..."
+
+# 使用环境变量设置 root 密码
+mysql -uroot --socket=/var/run/mysqld/mysqld.sock <<EOF
+USE mysql;
+ALTER USER 'root'@'localhost' IDENTIFIED BY '${MYSQL_ROOT_PASSWORD}';
+DELETE FROM mysql.user WHERE user = '';
+DROP DATABASE IF EXISTS test;
+DELETE FROM mysql.db WHERE Db='test' OR Db='test\\_%';
+FLUSH PRIVILEGES;
 EOF
-fi
+# fi
     
 # 执行初始化SQL
 if [ -f "/docker-entrypoint-initdb.d/init.sql" ]; then
