@@ -24,7 +24,7 @@ services:
     networks:
       - inception
     healthcheck:
-      test: ["CMD", "mysqladmin ping --protocol=socket -u root -p$(cat /run/secrets/db_root_password)"]
+      test: ["CMD-SHELL", "mysqladmin ping --protocol=socket -u root -p$(cat /run/secrets/db_root_password)"]
       interval: 10s
       timeout: 5s
       retries: 5
