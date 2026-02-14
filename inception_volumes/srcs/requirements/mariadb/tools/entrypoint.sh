@@ -243,35 +243,23 @@ set -e
 
 echo "Starting MariaDB setup..."
 
-# 确保目录存在且有正确权限
-# mkdir -p /var/run/mysqld
-# chown -R mysql:mysql /var/run/mysqld
-# chown -R mysql:mysql /var/lib/mysql
-
-# 生成初始化脚本（使用环境变量）
 bash /usr/local/bin/init.sh
 
 export MYSQL_ROOT_PASSWORD=$(cat "$MYSQL_ROOT_PASSWORD_FILE")
 echo "my root pwd is : ${MYSQL_ROOT_PASSWORD}"
 
 echo "Initializing MariaDB database..."
-# 初始化数据库
-mysql_install_db --user=mysql --datadir=/var/lib/mysql
 
-# 启动临时服务
+mysql_install_db --user=mysql --datadir=/var/lib/mysql
 mysqld_safe --datadir=/var/lib/mysql --skip-networking --socket=/var/run/mysqld/mysqld.sock &
 MYSQL_PID=$!
 
-# 等待MySQL启动
 until mysqladmin ping --socket=/var/run/mysqld/mysqld.sock --silent; do
    sleep 2
 done
-# 如果数据库未初始化，则进行初始化
-# if [ ! -d "/var/lib/mysql/mysql" ]; then
-    
+
 echo "Setting up initial database..."
 
-# 使用环境变量设置 root 密码
 mysql -uroot -p"${MYSQL_ROOT_PASSWORD}" --socket=/var/run/mysqld/mysqld.sock <<EOF
 USE mysql;
 ALTER USER 'root'@'localhost' IDENTIFIED BY '${MYSQL_ROOT_PASSWORD}';
@@ -280,9 +268,7 @@ DROP DATABASE IF EXISTS test;
 DELETE FROM mysql.db WHERE Db='test' OR Db='test\\_%';
 FLUSH PRIVILEGES;
 EOF
-# fi
     
-# 执行初始化SQL
 if [ -f "/docker-entrypoint-initdb.d/init.sql" ]; then
     echo "Executing init.sql..."
     mysql -uroot --socket=/var/run/mysqld/mysqld.sock -p"${MYSQL_ROOT_PASSWORD}" < /docker-entrypoint-initdb.d/init.sql

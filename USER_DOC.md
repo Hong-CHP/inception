@@ -18,7 +18,7 @@
 - **URL**: http://hporta-c.42.fr
 	- to visit homepage
 - **URL**: http://hporta-c.42.fr/wp-admin
-	- visit as adminstrator
+	- login in
 
 ## Locate and manage credentials
 - all sensible informations are memoried in /secrets/credentials.txt

@@ -25,7 +25,9 @@ This project is a learning environment for exploring the Docker ecosystem. It co
 	can create a network "mynet" in bridge mode with subnet address than using cmd:
 	`$ docker run -d -P --name debian01 --net mynet debian`
 	can isolat container "debian01" in a independant network system.
-- **Docker Volumes vs Bind Mounts**: Binds Mounts depends on the host path, in contrary, Volumes is operated by docker-compose.yml, better cross-platfrom compatibility and greater security.
+- **Docker Volumes vs Bind Mounts**: 
+- named volume can see by command : `docker volume ls`, in contrary, bind mounts is not
+- Binds Mounts depends on the host path, in contrary, Volumes is operated by docker-compose.yml, better cross-platfrom compatibility and greater security.
 
 
 ## Instructions

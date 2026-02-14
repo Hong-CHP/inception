@@ -23,5 +23,3 @@ RUN chmod +x /usr/local/bin/entrypoint.sh
 EXPOSE 9000
 
 CMD ["/usr/local/bin/entrypoint.sh"]
-	
-# CMD ["/usr/sbin/php-fpm8.2", "-F"]
